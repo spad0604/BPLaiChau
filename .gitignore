@@ -1,0 +1,54 @@
+
+# Python
+*.py[cod]
+__pycache__/
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+*/venv/
+
+# Environment files
+.env
+.env.*
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+.eggs/
+
+# Testing
+.pytest_cache/
+.tox/
+coverage.xml
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database
+*.sqlite3
+
+# Node
+node_modules/
+npm-debug.log*
+

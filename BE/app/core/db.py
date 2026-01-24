@@ -1,7 +1,7 @@
 from typing import Optional
 import psycopg2
 from psycopg2.extensions import connection as _connection
-from core.config import settings
+from app.core.config import settings
 
 
 def get_connection() -> Optional[_connection]:
@@ -15,10 +15,22 @@ def get_connection() -> Optional[_connection]:
     port = settings.DB_PORT
     dbname = settings.DB_NAME
 
-    # If any part is missing, try to fall back to DATABASE_URL (already parsed in config)
+    # If any part is missing, DATABASE_URL parsing may still have filled it.
     if not (user and password and host and dbname):
-        # cannot connect without required fields
-        raise RuntimeError("Database configuration incomplete. Set DATABASE_URL or DB_USER/DB_PASSWORD/DB_HOST/DB_NAME in .env")
+        raise RuntimeError(
+            "Database configuration incomplete. Set DATABASE_URL or DB_USER/DB_PASSWORD/DB_HOST/DB_NAME in .env"
+        )
 
     conn = psycopg2.connect(user=user, password=password, host=host, port=port or 5432, dbname=dbname)
     return conn
+
+
+def try_get_connection() -> Optional[_connection]:
+    """Best-effort DB connection.
+
+    Returns None if DB config is missing or the connection fails.
+    """
+    try:
+        return get_connection()
+    except Exception:
+        return None

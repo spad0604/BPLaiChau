@@ -7,15 +7,16 @@ class ApiException implements Exception {
   @override
   String toString() => 'ApiException: $message';
 
-  static ApiException fromDioError(DioError err) {
-    if (err.type == DioErrorType.badResponse && err.response != null) {
+  static ApiException fromDioException(DioException err) {
+    if (err.type == DioExceptionType.badResponse && err.response != null) {
       final data = err.response!.data;
-      if (data is Map && data['message'] != null)
+      if (data is Map && data['message'] != null) {
         return ApiException(data['message'].toString());
+      }
       return ApiException('HTTP ${err.response!.statusCode}');
     }
-    if (err.type == DioErrorType.connectionTimeout ||
-        err.type == DioErrorType.receiveTimeout) {
+    if (err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.receiveTimeout) {
       return ApiException('Connection timed out');
     }
     return ApiException(err.message ?? 'Unknown network error');

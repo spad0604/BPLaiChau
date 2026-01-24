@@ -1,6 +1,5 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from app.core.security import get_current_user
-from app.schemas.base_response import BaseResponse
 from app.models.user import User
 from typing import List
 from app.models.user import UserRole
@@ -10,5 +9,8 @@ class RoleChecker:
         self.allowed_roles = allowed_roles
     def __call__(self, user: User = Depends(get_current_user)) -> bool:
         if user.role not in self.allowed_roles:
-            return BaseResponse(status=403, message="Operation not permitted", data=None)
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Operation not permitted",
+            )
         return user

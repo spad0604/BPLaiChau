@@ -1,6 +1,6 @@
-class IncidentIn(BaseModel):
-    title: str
-    description: str
-    location: str
-    severity: str
-    reported_by: str
+"""Legacy module kept for compatibility.
+
+Prefer importing from `app.schemas.incident_schema`.
+"""
+
+from app.schemas.incident_schema import IncidentIn, IncidentOut  # noqa: F401

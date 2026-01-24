@@ -31,6 +31,7 @@ class LoginOutput(BaseModel):
     access_token: str
     username: str
     full_name: str
+    role: str
     date_of_birth: Optional[str] = None
     phone_number: Optional[str] = None
     gender: Optional[int] = None

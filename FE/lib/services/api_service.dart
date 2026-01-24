@@ -11,8 +11,8 @@ class ApiService {
     try {
       final r = await _dio.get(path, queryParameters: query);
       return r.data;
-    } on DioError catch (e) {
-      throw ApiException.fromDioError(e);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
     }
   }
 
@@ -20,8 +20,21 @@ class ApiService {
     try {
       final r = await _dio.post(path, data: data);
       return r.data;
-    } on DioError catch (e) {
-      throw ApiException.fromDioError(e);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  Future<dynamic> postFormUrlEncoded(String path, Map<String, dynamic> data) async {
+    try {
+      final r = await _dio.post(
+        path,
+        data: data,
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      );
+      return r.data;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
     }
   }
 
@@ -29,8 +42,8 @@ class ApiService {
     try {
       final r = await _dio.put(path, data: data);
       return r.data;
-    } on DioError catch (e) {
-      throw ApiException.fromDioError(e);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
     }
   }
 
@@ -38,8 +51,8 @@ class ApiService {
     try {
       final r = await _dio.delete(path);
       return r.data;
-    } on DioError catch (e) {
-      throw ApiException.fromDioError(e);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
     }
   }
 
@@ -47,8 +60,8 @@ class ApiService {
     try {
       final r = await _dio.post(path, data: formData);
       return r.data;
-    } on DioError catch (e) {
-      throw ApiException.fromDioError(e);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
     }
   }
 }

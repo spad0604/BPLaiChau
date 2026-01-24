@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, Query
 from typing import List, Dict, Any
 
 from .role_checker import RoleChecker
@@ -9,6 +9,15 @@ from app.services.incident_service import incident_service
 from app.services.cloudinary_service import upload_file
 
 router = APIRouter()
+
+
+@router.get("/stats")
+async def incident_stats(
+    station_id: str = Query(default=""),
+    year: int = Query(default=0),
+    title: str = Query(default=""),
+):
+    return incident_service.stats(station_id=station_id, year=year, title=title)
 
 
 @router.post("/report")
@@ -24,9 +33,15 @@ async def get_incident(incident_id: str):
     return incident_service.get(incident_id)
 
 
+@router.get("")
 @router.get("/")
-async def list_incidents():
-    return incident_service.list()
+async def list_incidents(
+    station_id: str = Query(default=""),
+    year: int = Query(default=0),
+    status: str = Query(default=""),
+    title: str = Query(default=""),
+):
+    return incident_service.list(station_id=station_id, year=year, status=status, title=title)
 
 
 @router.put("/{incident_id}")

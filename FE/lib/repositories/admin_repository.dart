@@ -6,7 +6,7 @@ class AdminRepository {
   AdminRepository(this.api);
 
   Future<List<Map<String, dynamic>>> listPublicAdmins() async {
-    final res = await api.get(Endpoints.ADMIN_LIST_PUBLIC);
+    final res = await api.get(Endpoints.adminListPublic);
     // BE returns a plain list of dicts for this endpoint
     if (res is List) return List<Map<String, dynamic>>.from(res);
     // fallback: check inside data
@@ -18,7 +18,7 @@ class AdminRepository {
   Future<Map<String, dynamic>?> createAdmin(
     Map<String, dynamic> userCreate,
   ) async {
-    final res = await api.post(Endpoints.ADMIN_CREATE, userCreate);
+    final res = await api.post(Endpoints.adminCreate, userCreate);
     final data = (res is Map && res['data'] != null) ? res['data'] : res;
     return (data is Map) ? Map<String, dynamic>.from(data) : null;
   }
@@ -27,7 +27,7 @@ class AdminRepository {
     String username,
     Map<String, dynamic> updates,
   ) async {
-    final path = Endpoints.ADMIN_BY_USERNAME.replaceFirst(
+    final path = Endpoints.adminByUsername.replaceFirst(
       '{username}',
       username,
     );
@@ -37,13 +37,14 @@ class AdminRepository {
   }
 
   Future<bool> deleteAdmin(String username) async {
-    final path = Endpoints.ADMIN_BY_USERNAME.replaceFirst(
+    final path = Endpoints.adminByUsername.replaceFirst(
       '{username}',
       username,
     );
     final res = await api.delete(path);
-    if (res is Map && res['status'] != null)
+    if (res is Map && res['status'] != null) {
       return res['status'] == 200 || res['status'] == '200';
+    }
     return true;
   }
 }

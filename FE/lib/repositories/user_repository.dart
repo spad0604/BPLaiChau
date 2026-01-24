@@ -9,7 +9,8 @@ class UserRepository {
 
   /// Attempts login; stores token on success and returns a UserModel.
   Future<UserModel> login(String username, String password) async {
-    final res = await api.post(Endpoints.AUTH_LOGIN, {
+    // BE uses OAuth2PasswordRequestForm, so send x-www-form-urlencoded.
+    final res = await api.postFormUrlEncoded(Endpoints.authLogin, {
       'username': username,
       'password': password,
     });
@@ -25,15 +26,21 @@ class UserRepository {
     if (token != null) TokenStorage.instance.token = token.toString();
 
     final userJson = payload['user'] ?? payload;
-    if (userJson is Map<String, dynamic>) {
-      return UserModel.fromJson(userJson);
+    UserModel user;
+    if (userJson is Map) {
+      user = UserModel.fromJson(Map<String, dynamic>.from(userJson));
+    } else {
+      user = UserModel(username: username, role: '');
     }
 
-    return UserModel(username: username, role: '');
+    // Persist for role-gated UI.
+    TokenStorage.instance.username = user.username.isNotEmpty ? user.username : username;
+    TokenStorage.instance.role = user.role;
+    return user;
   }
 
   Future<UserModel> profile() async {
-    final res = await api.get(Endpoints.USERS_ME);
+    final res = await api.get(Endpoints.usersMe);
     final payload = (res is Map && res['data'] != null) ? res['data'] : res;
     final userJson = payload is Map ? payload : {};
     return UserModel.fromJson(Map<String, dynamic>.from(userJson));

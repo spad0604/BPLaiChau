@@ -7,7 +7,9 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.core.config import settings
 from app.schemas.user import TokenData
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
+
+# Match the actual login endpoint.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

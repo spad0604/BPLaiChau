@@ -37,6 +37,7 @@ dependencies:
   get: ^4.7.3
   dio: ^5.9.0
   pretty_dio_logger: ^1.4.0
+  file_picker: ^8.1.7
 
 dev_dependencies:
   flutter_test:

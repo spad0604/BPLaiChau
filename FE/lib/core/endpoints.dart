@@ -3,7 +3,7 @@ class Endpoints {
   // Change this value once for all requests. Use emulator loopback for Android emulator.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://13.211.134.241:8080/api',
+    defaultValue: 'https://repository-moses-tears-browsing.trycloudflare.com/api',
   );
 
   // Auth

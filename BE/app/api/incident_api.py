@@ -59,7 +59,11 @@ async def upload_evidence(incident_id: str, files: List[UploadFile] = File(...),
     # upload files to Cloudinary and append urls to incident.evidence
     uploaded_urls = []
     for f in files:
-        url = upload_file(f.file)
+        try:
+            f.file.seek(0)
+        except Exception:
+            pass
+        url = upload_file(f.file, folder=f"bplaichau/incidents/{incident_id}")
         if url:
             uploaded_urls.append(url)
 

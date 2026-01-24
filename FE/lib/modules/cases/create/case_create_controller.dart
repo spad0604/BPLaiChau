@@ -15,6 +15,11 @@ class CaseCreateController extends BaseController {
   final StationRepository _stationRepo;
   CaseCreateController(this._repo, this._stationRepo);
 
+  String _fileKey(PlatformFile f) {
+    final p = f.path ?? '';
+    return '${f.name}|${f.size}|$p';
+  }
+
   final titleCtrl = TextEditingController();
   final locationCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
@@ -55,7 +60,15 @@ class CaseCreateController extends BaseController {
         withData: true,
       );
       if (result == null) return;
-      pickedFiles.assignAll(result.files);
+      final existingKeys = pickedFiles.map(_fileKey).toSet();
+      final merged = <PlatformFile>[...pickedFiles];
+      for (final f in result.files) {
+        final k = _fileKey(f);
+        if (existingKeys.contains(k)) continue;
+        existingKeys.add(k);
+        merged.add(f);
+      }
+      pickedFiles.assignAll(merged);
     } catch (e) {
       showError(e.toString());
     }
@@ -72,6 +85,10 @@ class CaseCreateController extends BaseController {
     } catch (_) {
       // ignore: station selection is optional
     }
+  }
+
+  Future<void> reloadStations() async {
+    await _loadStations();
   }
 
   void addSeizedItem() {

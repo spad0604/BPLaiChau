@@ -16,5 +16,6 @@ class AppPages {
     GetPage(name: Routes.caseCreate, page: () => const DashboardShell(), binding: DashboardBinding()),
     GetPage(name: Routes.stations, page: () => const DashboardShell(), binding: DashboardBinding()),
     GetPage(name: Routes.userManagement, page: () => const DashboardShell(), binding: DashboardBinding()),
+    GetPage(name: Routes.banners, page: () => const DashboardShell(), binding: DashboardBinding()),
   ];
 }

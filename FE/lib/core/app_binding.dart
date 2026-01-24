@@ -5,6 +5,7 @@ import '../repositories/user_repository.dart';
 import '../repositories/incident_repository.dart';
 import '../repositories/admin_repository.dart';
 import '../repositories/station_repository.dart';
+import '../repositories/banner_repository.dart';
 
 class AppBinding extends Bindings {
   @override
@@ -14,5 +15,6 @@ class AppBinding extends Bindings {
     Get.lazyPut<IncidentRepository>(() => IncidentRepository(Get.find<ApiService>()), fenix: true);
     Get.lazyPut<AdminRepository>(() => AdminRepository(Get.find<ApiService>()), fenix: true);
     Get.lazyPut<StationRepository>(() => StationRepository(Get.find<ApiService>()), fenix: true);
+    Get.lazyPut<BannerRepository>(() => BannerRepository(Get.find<ApiService>()), fenix: true);
   }
 }

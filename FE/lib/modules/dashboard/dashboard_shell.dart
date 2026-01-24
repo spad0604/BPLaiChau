@@ -8,6 +8,7 @@ import '../admin/users/user_management_view.dart';
 import '../cases/create/case_create_view.dart';
 import '../cases/list/case_list_view.dart';
 import '../stations/station_management_view.dart';
+import '../banners/banner_management_view.dart';
 import 'dashboard_nav_controller.dart';
 
 class DashboardShell extends GetView<DashboardNavController> {
@@ -32,6 +33,7 @@ class DashboardShell extends GetView<DashboardNavController> {
                   CaseCreateView(embedded: true),
                   StationManagementView(embedded: true),
                   UserManagementView(embedded: true),
+                  BannerManagementView(embedded: true),
                 ],
               ),
             ),
@@ -51,6 +53,8 @@ class DashboardShell extends GetView<DashboardNavController> {
         return 2;
       case SidebarItemKey.userManagement:
         return 3;
+      case SidebarItemKey.banners:
+        return 4;
     }
   }
 }

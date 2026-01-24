@@ -75,6 +75,17 @@ def init_db() -> None:
                     """
                 )
 
+                cur.execute(
+                    """
+                    create table if not exists background_banners (
+                        banner_id text primary key,
+                        image_url text not null,
+                        banner_title text default '',
+                        created_at timestamptz default now()
+                    );
+                    """
+                )
+
                 # Backfill/upgrade: add status column if table already existed
                 cur.execute("alter table incidents add column if not exists status text default 'Đang thụ lý';")
     finally:

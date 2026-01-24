@@ -44,6 +44,16 @@ class IncidentRepository {
     return IncidentModel.fromJson(Map<String, dynamic>.from(incident));
   }
 
+  /// Fetch full incident data as a raw map (preserves fields not in IncidentModel).
+  Future<Map<String, dynamic>?> getDetailMap(String id) async {
+    final path = Endpoints.incidentById.replaceFirst('{id}', id);
+    final res = await api.get(path);
+    final payload = (res is Map && res['data'] != null) ? res['data'] : res;
+    final incident = (payload is Map) ? payload['incident'] : null;
+    if (incident is Map) return Map<String, dynamic>.from(incident);
+    return null;
+  }
+
   Future<IncidentModel?> create(Map<String, dynamic> payload) async {
     final res = await api.post(Endpoints.incidentReport, payload);
     final data = (res is Map && res['data'] != null) ? res['data'] : res;
@@ -73,12 +83,10 @@ class IncidentRepository {
   /// Upload multiple files to an incident. `filePaths` are absolute paths.
   Future<List<String>> uploadEvidence(String id, List<String> filePaths) async {
     final path = Endpoints.incidentEvidence.replaceFirst('{id}', id);
-    final files = <MultipartFile>[];
+    final form = FormData();
     for (final p in filePaths) {
-      files.add(await MultipartFile.fromFile(p));
+      form.files.add(MapEntry('files', await MultipartFile.fromFile(p)));
     }
-
-    final form = FormData.fromMap({'files': files});
     final res = await api.postMultipart(path, form);
     final data = (res is Map && res['data'] != null) ? res['data'] : res;
     // backend returns BaseResponse with data possibly containing incident
@@ -95,19 +103,17 @@ class IncidentRepository {
   /// Upload multiple picked files (web/desktop compatible).
   Future<List<String>> uploadEvidenceFiles(String id, List<PlatformFile> files) async {
     final path = Endpoints.incidentEvidence.replaceFirst('{id}', id);
-    final parts = <MultipartFile>[];
-
+    final form = FormData();
     for (final f in files) {
       if (f.bytes != null) {
-        parts.add(MultipartFile.fromBytes(f.bytes!, filename: f.name));
+        form.files.add(MapEntry('files', MultipartFile.fromBytes(f.bytes!, filename: f.name)));
       } else if (f.path != null) {
-        parts.add(await MultipartFile.fromFile(f.path!, filename: f.name));
+        form.files.add(MapEntry('files', await MultipartFile.fromFile(f.path!, filename: f.name)));
       }
     }
 
-    if (parts.isEmpty) return [];
+    if (form.files.isEmpty) return [];
 
-    final form = FormData.fromMap({'files': parts});
     final res = await api.postMultipart(path, form);
     final data = (res is Map && res['data'] != null) ? res['data'] : res;
     if (data == null) return [];

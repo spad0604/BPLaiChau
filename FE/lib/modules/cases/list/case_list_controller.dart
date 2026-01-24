@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../../core/base_controller.dart';
 import '../../../models/incident_model.dart';
 import '../../../repositories/incident_repository.dart';
@@ -47,6 +48,10 @@ class CaseListController extends BaseController {
     } catch (_) {
       // ignore: stations filter is optional
     }
+  }
+
+  Future<void> reloadStations() async {
+    await _loadStations();
   }
 
   Future<void> fetch() async {
@@ -104,6 +109,24 @@ class CaseListController extends BaseController {
       showError(e.toString());
     } finally {
       setLoading(false);
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchCaseDetail(String id) async {
+    try {
+      return await _repo.getDetailMap(id);
+    } catch (e) {
+      showError(e.toString());
+      return null;
+    }
+  }
+
+  Future<List<String>> appendEvidence(String id, List<PlatformFile> files) async {
+    try {
+      return await _repo.uploadEvidenceFiles(id, files);
+    } catch (e) {
+      showError(e.toString());
+      return [];
     }
   }
 

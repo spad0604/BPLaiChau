@@ -1,7 +1,10 @@
 /// Centralized API endpoints and base URL for the app.
 class Endpoints {
   // Change this value once for all requests. Use emulator loopback for Android emulator.
-  static const String baseUrl = 'http://localhost:8000/api';
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://13.211.134.241:8080/api',
+  );
 
   // Auth
   static const String authLogin = '/auth/login';
@@ -27,4 +30,8 @@ class Endpoints {
   // Stations
   static const String stationList = '/stations';
   static const String stationById = '/stations/{id}';
+
+  // Banners
+  static const String banners = '/banners';
+  static const String bannerById = '/banners/{id}';
 }

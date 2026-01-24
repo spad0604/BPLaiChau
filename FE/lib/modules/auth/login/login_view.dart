@@ -19,10 +19,43 @@ class LoginView extends GetView<LoginController> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.network(
-                  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop',
-                  fit: BoxFit.cover,
-                ),
+                Obx(() {
+                  final fallback = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop';
+                  final urls = controller.bannerUrls;
+                  final idx = controller.bannerIndex.value;
+                  final url = (urls.isNotEmpty && idx >= 0 && idx < urls.length) ? urls[idx] : fallback;
+                  Widget buildImage(String imageUrl) {
+                    return SizedBox.expand(
+                      child: Image.network(
+                        imageUrl,
+                        key: ValueKey(imageUrl),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
+                        errorBuilder: (c, e, st) => Image.network(
+                          fallback,
+                          fit: BoxFit.cover,
+                          alignment: Alignment.center,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 450),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: <Widget>[
+                          ...previousChildren,
+                          if (currentChild != null) currentChild,
+                        ],
+                      );
+                    },
+                    child: buildImage(url),
+                  );
+                }),
                 Container(color: Colors.black.withAlpha(102)),
                 const Positioned(
                   bottom: 60,
@@ -62,16 +95,22 @@ class LoginView extends GetView<LoginController> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo placeholder
+                      // Logo: national emblem (SVG)
                       Container(
-                        width: 80,
-                        height: 80,
+                        width: 120,
+                        height: 120,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
                           boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
                         ),
-                        child: const Icon(Icons.security, size: 40, color: Color(0xFFCE1126)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Image.network(
+                            'https://res.cloudinary.com/dhhdd4pkl/image/upload/v1769262279/Emblem_of_Vietnam_z1ltez.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 24),
                       const Text(

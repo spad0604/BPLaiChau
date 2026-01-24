@@ -1,11 +1,21 @@
 import 'package:get/get.dart';
 import '../../widgets/dashboard/sidebar.dart';
+import '../cases/create/case_create_controller.dart';
+import '../cases/list/case_list_controller.dart';
 
 class DashboardNavController extends GetxController {
   final Rx<SidebarItemKey> active = SidebarItemKey.cases.obs;
 
   void select(SidebarItemKey key) {
     active.value = key;
+
+    // Ensure station dropdowns reflect newest data after station CRUD.
+    if (key == SidebarItemKey.createCase && Get.isRegistered<CaseCreateController>()) {
+      Get.find<CaseCreateController>().reloadStations();
+    }
+    if (key == SidebarItemKey.cases && Get.isRegistered<CaseListController>()) {
+      Get.find<CaseListController>().reloadStations();
+    }
   }
 
   String get breadcrumb {
@@ -18,6 +28,8 @@ class DashboardNavController extends GetxController {
         return 'Hệ thống  /  Danh mục  /  Đồn biên phòng';
       case SidebarItemKey.userManagement:
         return 'Home  /  Administration  /  Users';
+      case SidebarItemKey.banners:
+        return 'Hệ thống  /  Banner';
     }
   }
 
@@ -31,6 +43,8 @@ class DashboardNavController extends GetxController {
         return 'Quản lý đồn biên phòng';
       case SidebarItemKey.userManagement:
         return 'Personnel Access Control';
+      case SidebarItemKey.banners:
+        return 'Quản lý banner';
     }
   }
 }

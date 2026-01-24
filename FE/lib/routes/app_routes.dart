@@ -6,5 +6,6 @@ abstract class Routes {
   static const caseList = '/cases';
   static const caseCreate = '/cases/create';
   static const stations = '/stations';
-  static const userManagement = '/admin/users';
+  static const userManagement = '/users';
+  static const banners = '/banners';
 }

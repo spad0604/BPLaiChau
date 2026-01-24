@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../../core/base_controller.dart';
 import '../../models/station_model.dart';
 import '../../repositories/station_repository.dart';
+import '../cases/create/case_create_controller.dart';
+import '../cases/list/case_list_controller.dart';
 
 class StationManagementController extends BaseController {
   final StationRepository _repo;
@@ -33,6 +35,15 @@ class StationManagementController extends BaseController {
     }
   }
 
+  Future<void> _notifyStationsChanged() async {
+    if (Get.isRegistered<CaseCreateController>()) {
+      await Get.find<CaseCreateController>().reloadStations();
+    }
+    if (Get.isRegistered<CaseListController>()) {
+      await Get.find<CaseListController>().reloadStations();
+    }
+  }
+
   Future<void> create() async {
     if (nameCtrl.text.trim().isEmpty) {
       showError('Vui lòng nhập tên đồn');
@@ -47,6 +58,7 @@ class StationManagementController extends BaseController {
         'phone': phoneCtrl.text.trim(),
       });
       await fetch();
+      await _notifyStationsChanged();
       nameCtrl.clear();
       codeCtrl.clear();
       addressCtrl.clear();
@@ -63,6 +75,7 @@ class StationManagementController extends BaseController {
     try {
       await _repo.update(id, updates);
       await fetch();
+      await _notifyStationsChanged();
       showSuccess('Đã cập nhật đồn');
     } catch (e) {
       showError(e.toString());
@@ -76,6 +89,7 @@ class StationManagementController extends BaseController {
     try {
       await _repo.delete(id);
       await fetch();
+      await _notifyStationsChanged();
       showSuccess('Đã xoá đồn');
     } catch (e) {
       showError(e.toString());

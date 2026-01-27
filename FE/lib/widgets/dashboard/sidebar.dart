@@ -7,11 +7,11 @@ enum SidebarItemKey { cases, createCase, stations, userManagement, banners }
 
 class SidebarItem {
   final SidebarItemKey key;
-  final String title;
+  final String titleKey;
   final IconData icon;
   final String route;
 
-  const SidebarItem({required this.key, required this.title, required this.icon, required this.route});
+  const SidebarItem({required this.key, required this.titleKey, required this.icon, required this.route});
 }
 
 class DashboardSidebar extends StatelessWidget {
@@ -21,11 +21,11 @@ class DashboardSidebar extends StatelessWidget {
   const DashboardSidebar({super.key, required this.active, this.onSelect});
 
   static const items = <SidebarItem>[
-    SidebarItem(key: SidebarItemKey.cases, title: 'Danh sách chuyên án', icon: Icons.folder_outlined, route: Routes.caseList),
-    SidebarItem(key: SidebarItemKey.createCase, title: 'Thêm chuyên án', icon: Icons.add_circle_outline, route: Routes.caseCreate),
-    SidebarItem(key: SidebarItemKey.stations, title: 'Quản lý đồn biên phòng', icon: Icons.apartment_outlined, route: Routes.stations),
-    SidebarItem(key: SidebarItemKey.userManagement, title: 'Quản lý cán bộ', icon: Icons.people_outline, route: Routes.userManagement),
-    SidebarItem(key: SidebarItemKey.banners, title: 'Quản lý banner', icon: Icons.image_outlined, route: Routes.banners),
+    SidebarItem(key: SidebarItemKey.cases, titleKey: 'sidebar.cases', icon: Icons.folder_outlined, route: Routes.caseList),
+    SidebarItem(key: SidebarItemKey.createCase, titleKey: 'sidebar.createCase', icon: Icons.add_circle_outline, route: Routes.caseCreate),
+    SidebarItem(key: SidebarItemKey.stations, titleKey: 'sidebar.stations', icon: Icons.apartment_outlined, route: Routes.stations),
+    SidebarItem(key: SidebarItemKey.userManagement, titleKey: 'sidebar.userManagement', icon: Icons.people_outline, route: Routes.userManagement),
+    SidebarItem(key: SidebarItemKey.banners, titleKey: 'sidebar.banners', icon: Icons.image_outlined, route: Routes.banners),
   ];
 
   @override
@@ -52,19 +52,16 @@ class DashboardSidebar extends StatelessWidget {
                 SizedBox(
                   width: 36,
                   height: 36,
-                  child: Image.network(
-                    'https://upload.wikimedia.org/wikipedia/vi/thumb/3/3e/Ph%C3%B9_hi%E1%BB%87u_B%E1%BB%99_%C4%91%E1%BB%99i_Bi%C3%AAn_ph%C3%B2ng_Vi%E1%BB%87t_Nam.webp/408px-Ph%C3%B9_hi%E1%BB%87u_B%E1%BB%99_%C4%91%E1%BB%99i_Bi%C3%AAn_ph%C3%B2ng_Vi%E1%BB%87t_Nam.webp.png',
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('BĐBP Lai Châu', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('sidebar.brandTitle'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
                       SizedBox(height: 2),
-                      Text('HỆ THỐNG QUẢN LÝ', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                      Text('sidebar.brandSubtitle'.tr, style: const TextStyle(fontSize: 11, color: Colors.grey)),
                     ],
                   ),
                 )
@@ -76,7 +73,7 @@ class DashboardSidebar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('DANH MỤC', style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
+              child: Text('sidebar.section'.tr, style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(height: 8),
@@ -93,7 +90,7 @@ class DashboardSidebar extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     leading: Icon(item.icon, size: 20, color: isActive ? const Color(0xFF1B4D3E) : Colors.grey.shade700),
                     title: Text(
-                      item.title,
+                      item.titleKey.tr,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
@@ -129,15 +126,18 @@ class DashboardSidebar extends StatelessWidget {
                       Text(TokenStorage.instance.username ?? 'Nguyễn Văn A', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 2),
                       Text(
-                        role == 'super_admin' ? 'Quản trị tối cao' : 'Quản trị viên',
+                        role == 'super_admin' ? 'role.superAdmin'.tr : 'role.admin'.tr,
                         style: const TextStyle(fontSize: 10, color: Colors.grey),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Đăng xuất',
-                  onPressed: () => Get.offAllNamed(Routes.login),
+                  tooltip: 'common.logout'.tr,
+                  onPressed: () async {
+                    await TokenStorage.instance.clear();
+                    Get.offAllNamed(Routes.login);
+                  },
                   icon: const Icon(Icons.logout, size: 18),
                 )
               ],

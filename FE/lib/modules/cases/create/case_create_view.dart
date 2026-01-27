@@ -33,27 +33,17 @@ class CaseCreateView extends GetView<CaseCreateController> {
                     child: Column(
                       children: [
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: Obx(() {
-                                final d = controller.date.value;
-                                return InkWell(
-                                  onTap: () => controller.pickDate(context),
-                                  child: InputDecorator(
-                                    decoration: InputDecoration(
-                                      labelText: 'Ngày xảy ra',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      d == null
-                                          ? 'mm/dd/yyyy'
-                                          : '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}',
-                                    ),
-                                  ),
-                                );
-                              }),
+                              child: AppTextField(
+                                label: 'Ngày xảy ra',
+                                hint: 'mm/dd/yyyy',
+                                controller: controller.dateTextCtrl,
+                                readOnly: true,
+                                onTap: () => controller.pickDate(context),
+                                prefixIcon: Icons.calendar_month_outlined,
+                              ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(

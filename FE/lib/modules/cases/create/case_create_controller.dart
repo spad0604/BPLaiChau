@@ -24,6 +24,9 @@ class CaseCreateController extends BaseController {
   final locationCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
 
+  final dateTextCtrl = TextEditingController();
+  Worker? _dateWorker;
+
   // Classification
   final RxString incidentType = 'criminal'.obs; // criminal | administrative
   final RxString severity = 'medium'.obs; // low | medium | high | critical
@@ -51,6 +54,15 @@ class CaseCreateController extends BaseController {
     super.onInit();
     _loadStations();
     if (seizedItems.isEmpty) addSeizedItem();
+
+    _dateWorker?.dispose();
+    _dateWorker = ever<DateTime?>(date, (d) {
+      if (d == null) {
+        dateTextCtrl.text = '';
+      } else {
+        dateTextCtrl.text = '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+      }
+    });
   }
 
   Future<void> pickEvidenceFiles() async {
@@ -183,6 +195,8 @@ class CaseCreateController extends BaseController {
 
   @override
   void onClose() {
+    _dateWorker?.dispose();
+    dateTextCtrl.dispose();
     titleCtrl.dispose();
     locationCtrl.dispose();
     descriptionCtrl.dispose();

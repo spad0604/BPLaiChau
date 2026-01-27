@@ -17,6 +17,7 @@ class CaseListController extends BaseController {
   final RxList<StationModel> stations = <StationModel>[].obs;
   final RxString stationIdFilter = ''.obs; // '' = all
   final RxString statusFilter = ''.obs; // '' = all
+  final RxString incidentTypeFilter = ''.obs; // '' = all, 'criminal', 'administrative'
   final RxInt yearFilter = 0.obs; // 0 = all
 
   final RxInt total = 0.obs;
@@ -37,7 +38,7 @@ class CaseListController extends BaseController {
       (_) => fetch(),
       time: const Duration(milliseconds: 350),
     );
-    _filtersWorker = everAll([stationIdFilter, statusFilter, yearFilter], (_) => fetch());
+    _filtersWorker = everAll([stationIdFilter, statusFilter, incidentTypeFilter, yearFilter], (_) => fetch());
 
     fetch();
   }
@@ -59,11 +60,12 @@ class CaseListController extends BaseController {
     try {
       final stationId = stationIdFilter.value;
       final status = statusFilter.value;
+      final incidentType = incidentTypeFilter.value;
       final year = yearFilter.value;
       final title = query.value.trim();
 
       final results = await Future.wait([
-        _repo.list(stationId: stationId, year: year, status: status, title: title),
+        _repo.list(stationId: stationId, year: year, status: status, incidentType: incidentType, title: title),
         _repo.stats(stationId: stationId, year: year, title: title),
       ]);
 

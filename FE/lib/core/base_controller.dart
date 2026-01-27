@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 /// Base controller for GetX MVC-style controllers.
 /// Provide common helpers: loading state, error handling, simple navigation helpers.
@@ -9,30 +10,39 @@ class BaseController extends GetxController {
 
   void setLoading(bool v) {
     isLoadingRx.value = v;
+    if (v) {
+      if (!EasyLoading.isShow) {
+        EasyLoading.show(status: 'common.loading'.tr);
+      }
+    } else {
+      if (EasyLoading.isShow) {
+        EasyLoading.dismiss();
+      }
+    }
     update();
   }
 
-  void showError(String message, {String title = 'Lỗi'}) {
+  void showError(String message, {String title = 'common.error'}) {
     _snack(
-      title: title,
+      title: title.tr,
       message: message,
       background: const Color(0xFFD32F2F),
       icon: Icons.error_outline,
     );
   }
 
-  void showSuccess(String message, {String title = 'Thành công'}) {
+  void showSuccess(String message, {String title = 'common.success'}) {
     _snack(
-      title: title,
+      title: title.tr,
       message: message,
       background: const Color(0xFF1B4D3E),
       icon: Icons.check_circle_outline,
     );
   }
 
-  void showInfo(String message, {String title = 'Thông báo'}) {
+  void showInfo(String message, {String title = 'common.info'}) {
     _snack(
-      title: title,
+      title: title.tr,
       message: message,
       background: const Color(0xFF1565C0),
       icon: Icons.info_outline,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../core/i18n/app_translations.dart';
 
 class DashboardTopBar extends StatelessWidget {
   final String breadcrumb;
@@ -29,6 +31,30 @@ class DashboardTopBar extends StatelessWidget {
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none)),
           const SizedBox(width: 8),
           IconButton(onPressed: () {}, icon: const Icon(Icons.help_outline)),
+          const SizedBox(width: 8),
+          PopupMenuButton<Locale>(
+            tooltip: 'Language',
+            onSelected: (loc) => Get.updateLocale(loc),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: AppTranslations.viVN, child: Text('Tiếng Việt')),
+              PopupMenuItem(value: AppTranslations.enUS, child: Text('English')),
+            ],
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey.shade200),
+                color: Colors.white,
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.language, size: 18),
+                  const SizedBox(width: 6),
+                  Text(Get.locale?.languageCode.toUpperCase() ?? 'VI', style: const TextStyle(fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

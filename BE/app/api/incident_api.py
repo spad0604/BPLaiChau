@@ -39,9 +39,10 @@ async def list_incidents(
     station_id: str = Query(default=""),
     year: int = Query(default=0),
     status: str = Query(default=""),
+    incident_type: str = Query(default=""),
     title: str = Query(default=""),
 ):
-    return incident_service.list(station_id=station_id, year=year, status=status, title=title)
+    return incident_service.list(station_id=station_id, year=year, status=status, incident_type=incident_type, title=title)
 
 
 @router.put("/{incident_id}")

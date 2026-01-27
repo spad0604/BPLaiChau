@@ -40,7 +40,7 @@ class UserManagementController extends BaseController {
 
   Future<void> createAccount() async {
     if (usernameCtrl.text.trim().isEmpty || passwordCtrl.text.trim().isEmpty) {
-      showError('Vui lòng nhập username và password');
+      showError('admins.validation.usernamePassword'.tr);
       return;
     }
     setLoading(true);
@@ -69,14 +69,16 @@ class UserManagementController extends BaseController {
     }
   }
 
-  Future<void> updateUser(String username, Map<String, dynamic> updates) async {
+  Future<bool> updateUser(String username, Map<String, dynamic> updates) async {
     setLoading(true);
     try {
       await _repo.updateAdmin(username, updates);
       await fetch();
-      showSuccess('Đã cập nhật tài khoản');
+      showSuccess('admins.updated'.tr);
+      return true;
     } catch (e) {
       showError(e.toString());
+      return false;
     } finally {
       setLoading(false);
     }
@@ -87,7 +89,7 @@ class UserManagementController extends BaseController {
     try {
       await _repo.deleteAdmin(username);
       await fetch();
-      showSuccess('Đã xoá tài khoản');
+      showSuccess('admins.deleted'.tr);
     } catch (e) {
       showError(e.toString());
     } finally {

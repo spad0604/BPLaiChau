@@ -21,30 +21,30 @@ class DashboardNavController extends GetxController {
   String get breadcrumb {
     switch (active.value) {
       case SidebarItemKey.cases:
-        return 'Trang chủ  /  Quản lý chuyên án';
+        return 'nav.breadcrumb.cases'.tr;
       case SidebarItemKey.createCase:
-        return 'Hệ thống  /  Quản lý vụ việc  /  Thêm mới';
+        return 'nav.breadcrumb.createCase'.tr;
       case SidebarItemKey.stations:
-        return 'Hệ thống  /  Danh mục  /  Đồn biên phòng';
+        return 'nav.breadcrumb.stations'.tr;
       case SidebarItemKey.userManagement:
-        return 'Home  /  Administration  /  Users';
+        return 'nav.breadcrumb.users'.tr;
       case SidebarItemKey.banners:
-        return 'Hệ thống  /  Banner';
+        return 'nav.breadcrumb.banners'.tr;
     }
   }
 
   String get title {
     switch (active.value) {
       case SidebarItemKey.cases:
-        return 'Danh sách chuyên án';
+        return 'nav.title.cases'.tr;
       case SidebarItemKey.createCase:
-        return 'Thêm vụ việc mới';
+        return 'nav.title.createCase'.tr;
       case SidebarItemKey.stations:
-        return 'Quản lý đồn biên phòng';
+        return 'nav.title.stations'.tr;
       case SidebarItemKey.userManagement:
-        return 'Personnel Access Control';
+        return 'nav.title.users'.tr;
       case SidebarItemKey.banners:
-        return 'Quản lý banner';
+        return 'nav.title.banners'.tr;
     }
   }
 }

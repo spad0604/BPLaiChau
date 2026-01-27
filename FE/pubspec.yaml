@@ -1,5 +1,5 @@
 name: starter
-description: "A new Flutter project."
+description: "hệ thống quản lý vụ việc"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -39,6 +39,8 @@ dependencies:
   pretty_dio_logger: ^1.4.0
   file_picker: ^8.1.7
   flutter_svg: ^2.2.3
+  flutter_easyloading: ^3.0.5
+  shared_preferences: ^2.3.5
 
 dev_dependencies:
   flutter_test:
@@ -61,6 +63,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

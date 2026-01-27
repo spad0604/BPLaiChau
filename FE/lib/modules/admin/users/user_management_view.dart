@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../services/export/export_service.dart';
 import '../../../widgets/dashboard/dashboard_layout.dart';
 import '../../../widgets/dashboard/sidebar.dart';
 import '../../../widgets/dashboard/top_bar.dart';
@@ -46,7 +47,7 @@ class UserManagementView extends GetView<UserManagementController> {
                               Expanded(
                                 child: TextField(
                                   decoration: InputDecoration(
-                                    hintText: 'Search by name, rank, or service number...',
+                                    hintText: 'admins.searchHint'.tr,
                                     prefixIcon: const Icon(Icons.search),
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                   ),
@@ -56,14 +57,17 @@ class UserManagementView extends GetView<UserManagementController> {
                               OutlinedButton.icon(
                                 onPressed: () {},
                                 icon: const Icon(Icons.filter_alt_outlined),
-                                label: const Text('Filter'),
+                                label: Text('common.filter'.tr),
                                 style: _outlinedStyle(),
                               ),
                               const SizedBox(width: 10),
                               OutlinedButton.icon(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await ExportService.exportAdminsCsv(controller.items.toList());
+                                  controller.showSuccess('export.adminsDone'.tr);
+                                },
                                 icon: const Icon(Icons.file_download_outlined),
-                                label: const Text('Export'),
+                                label: Text('common.export'.tr),
                                 style: _outlinedStyle(),
                               ),
                             ],
@@ -84,11 +88,11 @@ class UserManagementView extends GetView<UserManagementController> {
                                           horizontalMargin: 12,
                                           dataRowMinHeight: 64,
                                           dataRowMaxHeight: 110,
-                                          columns: const [
-                                            DataColumn(label: Text('OFFICER')),
-                                            DataColumn(label: Text('UNIT / STATION')),
-                                            DataColumn(label: Text('ROLE')),
-                                            DataColumn(label: Text('STATUS')),
+                                          columns: [
+                                            DataColumn(label: Text('admins.officer'.tr)),
+                                            DataColumn(label: Text('admins.unit'.tr)),
+                                            DataColumn(label: Text('admins.role'.tr)),
+                                            DataColumn(label: Text('admins.status'.tr)),
                                             DataColumn(label: Text('')),
                                           ],
                                           rows: list.map((u) {
@@ -106,11 +110,11 @@ class UserManagementView extends GetView<UserManagementController> {
                                                 ],
                                               )),
                                               const DataCell(Text('-')),
-                                              DataCell(Text(role.isEmpty ? 'Admin' : role)),
+                                              DataCell(Text(role.isEmpty ? 'role.admin'.tr : role)),
                                               DataCell(Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                                 decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(20)),
-                                                child: const Text('Active', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
+                                                child: Text('common.active'.tr, style: const TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
                                               )),
                                           DataCell(
                                             PopupMenuButton<String>(
@@ -329,7 +333,6 @@ class UserManagementView extends GetView<UserManagementController> {
                       const SizedBox(width: 10),
                       ElevatedButton(
                         onPressed: () async {
-                          Navigator.of(ctx).pop();
                           final payload = <String, dynamic>{
                             'username': usernameCtrl.text.trim(),
                             'role': roleRx.value,
@@ -338,7 +341,8 @@ class UserManagementView extends GetView<UserManagementController> {
                           if (passwordCtrl.text.trim().isNotEmpty) {
                             payload['password'] = passwordCtrl.text.trim();
                           }
-                          await controller.updateUser(originalUsername, payload);
+                          final ok = await controller.updateUser(originalUsername, payload);
+                          if (ok && ctx.mounted) Navigator.of(ctx).pop();
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1B4D3E), foregroundColor: Colors.white),
                         child: const Text('Lưu'),

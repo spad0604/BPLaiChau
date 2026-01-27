@@ -22,13 +22,12 @@ class LoginView extends GetView<LoginController> {
                 Obx(() {
                   final fallback = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop';
                   final urls = controller.bannerUrls;
-                  final idx = controller.bannerIndex.value;
-                  final url = (urls.isNotEmpty && idx >= 0 && idx < urls.length) ? urls[idx] : fallback;
+                  final list = urls.isNotEmpty ? urls.toList(growable: false) : <String>[fallback];
+
                   Widget buildImage(String imageUrl) {
                     return SizedBox.expand(
                       child: Image.network(
                         imageUrl,
-                        key: ValueKey(imageUrl),
                         fit: BoxFit.cover,
                         alignment: Alignment.center,
                         errorBuilder: (c, e, st) => Image.network(
@@ -40,20 +39,16 @@ class LoginView extends GetView<LoginController> {
                     );
                   }
 
-                  return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 450),
-                    switchInCurve: Curves.easeOut,
-                    switchOutCurve: Curves.easeIn,
-                    layoutBuilder: (currentChild, previousChildren) {
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: <Widget>[
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
-                        ],
-                      );
+                  return PageView.builder(
+                    controller: controller.bannerPageController,
+                    reverse: true,
+                    itemCount: list.length,
+                    onPageChanged: (i) {
+                      if (urls.isNotEmpty) {
+                        controller.bannerIndex.value = i;
+                      }
                     },
-                    child: buildImage(url),
+                    itemBuilder: (context, i) => buildImage(list[i]),
                   );
                 }),
                 Container(color: Colors.black.withAlpha(102)),
@@ -156,12 +151,15 @@ class LoginView extends GetView<LoginController> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
+                          Obx(() => Row(
                             children: [
-                              Checkbox(value: false, onChanged: (v) {}),
+                              Checkbox(
+                                value: controller.rememberMe.value,
+                                onChanged: (v) => controller.rememberMe.value = v ?? false,
+                              ),
                               const Text("Ghi nhớ trên thiết bị này"),
                             ],
-                          ),
+                          )),
                           TextButton(onPressed: () {}, child: const Text("Quên mật khẩu?")),
                         ],
                       ),

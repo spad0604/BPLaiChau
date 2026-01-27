@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../services/export/export_service.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/stat_card.dart';
 import '../../../widgets/status_badge.dart';
@@ -60,16 +61,19 @@ class CaseListView extends GetView<CaseListController> {
         children: [
                   Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Theo dõi, cập nhật và quản lý hồ sơ các chuyên án trên địa bàn tỉnh Lai Châu.',
-                          style: TextStyle(color: Colors.grey),
+                          'cases.headerDesc'.tr,
+                          style: const TextStyle(color: Colors.grey),
                         ),
                       ),
                       OutlinedButton.icon(
-                        onPressed: () {},
+                        onPressed: () async {
+                          await ExportService.exportIncidentsCsv(controller.items.toList());
+                          controller.showSuccess('export.incidentsDone'.tr);
+                        },
                         icon: const Icon(Icons.file_download_outlined),
-                        label: const Text('Xuất báo cáo'),
+                        label: Text('common.exportReport'.tr),
                         style: _outlinedStyle(),
                       ),
                       const SizedBox(width: 12),
@@ -82,7 +86,7 @@ class CaseListView extends GetView<CaseListController> {
                           Get.offAllNamed(Routes.caseCreate);
                         },
                         icon: const Icon(Icons.add),
-                        label: const Text('Thêm chuyên án mới'),
+                        label: Text('cases.addNew'.tr),
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1B4D3E), foregroundColor: Colors.white),
                       ),
                     ],
@@ -122,7 +126,7 @@ class CaseListView extends GetView<CaseListController> {
                                 onChanged: (v) => controller.query.value = v,
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.search),
-                                  hintText: 'Tìm kiếm theo tiêu đề',
+                                  hintText: 'cases.searchHintTitle'.tr,
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade200)),
                                 ),
                               ),
@@ -132,7 +136,7 @@ class CaseListView extends GetView<CaseListController> {
                               width: 160,
                               child: Obx(() {
                                 final items = <AppDropdownItem<String>>[
-                                  const AppDropdownItem(value: '', label: 'Tất cả đơn vị'),
+                                  AppDropdownItem(value: '', label: 'cases.filter.allStations'.tr),
                                   ...controller.stations.map((s) => AppDropdownItem(value: s.stationId, label: s.name)),
                                 ];
                                 return AppDropdown<String>(
@@ -147,12 +151,25 @@ class CaseListView extends GetView<CaseListController> {
                               width: 160,
                               child: Obx(() => AppDropdown<String>(
                                     value: controller.statusFilter.value,
-                                    items: const [
-                                      AppDropdownItem(value: '', label: 'Tất cả trạng thái'),
-                                      AppDropdownItem(value: 'Đang thụ lý', label: 'Đang thụ lý'),
-                                      AppDropdownItem(value: 'Hoàn thành', label: 'Hoàn thành'),
+                                    items: [
+                                      AppDropdownItem(value: '', label: 'cases.filter.allStatuses'.tr),
+                                      AppDropdownItem(value: 'Đang thụ lý', label: 'cases.status.inProgress'.tr),
+                                      AppDropdownItem(value: 'Hoàn thành', label: 'cases.status.completed'.tr),
                                     ],
                                     onChanged: (v) => controller.statusFilter.value = v,
+                                  )),
+                            ),
+                            const SizedBox(width: 12),
+                            SizedBox(
+                              width: 160,
+                              child: Obx(() => AppDropdown<String>(
+                                    value: controller.incidentTypeFilter.value,
+                                    items: [
+                                      AppDropdownItem(value: '', label: 'Tất cả hình thức'),
+                                      AppDropdownItem(value: 'criminal', label: 'Vụ án hình sự'),
+                                      AppDropdownItem(value: 'administrative', label: 'Vi phạm hành chính'),
+                                    ],
+                                    onChanged: (v) => controller.incidentTypeFilter.value = v,
                                   )),
                             ),
                             const SizedBox(width: 12),
@@ -161,7 +178,7 @@ class CaseListView extends GetView<CaseListController> {
                               child: Obx(() {
                                 final years = controller.yearOptions;
                                 final items = <AppDropdownItem<int>>[
-                                  const AppDropdownItem(value: 0, label: 'Tất cả năm'),
+                                  AppDropdownItem(value: 0, label: 'cases.filter.allYears'.tr),
                                   ...years.map((y) => AppDropdownItem(value: y, label: y.toString())),
                                 ];
                                 return AppDropdown<int>(
@@ -172,12 +189,6 @@ class CaseListView extends GetView<CaseListController> {
                               }),
                             ),
                             const SizedBox(width: 12),
-                            OutlinedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(Icons.tune),
-                              label: const Text('Lọc nâng cao'),
-                              style: _outlinedStyle(),
-                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -185,23 +196,44 @@ class CaseListView extends GetView<CaseListController> {
                           final chips = <Widget>[];
 
                           if (controller.yearFilter.value != 0) {
-                            chips.add(_FilterChip(label: 'Năm: ${controller.yearFilter.value}', onClear: () => controller.yearFilter.value = 0));
+                            chips.add(_FilterChip(
+                              label: 'cases.filter.yearChip'.trParams({'year': controller.yearFilter.value.toString()}),
+                              onClear: () => controller.yearFilter.value = 0,
+                            ));
                           }
                           if (controller.stationIdFilter.value.isNotEmpty) {
                             final st = controller.stations.firstWhereOrNull((s) => s.stationId == controller.stationIdFilter.value);
-                            chips.add(_FilterChip(label: 'Đơn vị: ${st?.name ?? controller.stationIdFilter.value}', onClear: () => controller.stationIdFilter.value = ''));
+                            chips.add(_FilterChip(
+                              label: 'cases.filter.stationChip'.trParams({'station': st?.name ?? controller.stationIdFilter.value}),
+                              onClear: () => controller.stationIdFilter.value = '',
+                            ));
                           }
                           if (controller.statusFilter.value.isNotEmpty) {
-                            chips.add(_FilterChip(label: 'Trạng thái: ${controller.statusFilter.value}', onClear: () => controller.statusFilter.value = ''));
+                            chips.add(_FilterChip(
+                              label: 'cases.filter.statusChip'.trParams({'status': controller.statusFilter.value}),
+                              onClear: () => controller.statusFilter.value = '',
+                            ));
+                          }
+                          if (controller.incidentTypeFilter.value.isNotEmpty) {
+                            final typeLabel = controller.incidentTypeFilter.value == 'criminal' 
+                                ? 'Vụ án hình sự' 
+                                : 'Vi phạm hành chính';
+                            chips.add(_FilterChip(
+                              label: 'Hình thức: $typeLabel',
+                              onClear: () => controller.incidentTypeFilter.value = '',
+                            ));
                           }
                           if (controller.query.value.trim().isNotEmpty) {
-                            chips.add(_FilterChip(label: 'Từ khóa: ${controller.query.value.trim()}', onClear: () => controller.query.value = ''));
+                            chips.add(_FilterChip(
+                              label: 'cases.filter.keywordChip'.trParams({'keyword': controller.query.value.trim()}),
+                              onClear: () => controller.query.value = '',
+                            ));
                           }
 
                           if (chips.isEmpty) {
                             return Align(
                               alignment: Alignment.centerLeft,
-                              child: Text('Không có bộ lọc', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                              child: Text('cases.filter.none'.tr, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                             );
                           }
 
@@ -224,20 +256,25 @@ class CaseListView extends GetView<CaseListController> {
                                     horizontalMargin: 12,
                                     dataRowMinHeight: 68,
                                     dataRowMaxHeight: 120,
-                                    columns: const [
-                                      DataColumn(label: Text('MÃ HỒ SƠ')),
-                                      DataColumn(label: Text('TÊN CHUYÊN ÁN / NỘI DUNG')),
-                                      DataColumn(label: Text('ĐỒN BIÊN PHÒNG')),
-                                      DataColumn(label: Text('ĐỊA BÀN')),
-                                      DataColumn(label: Text('NGÀY LẬP')),
-                                      DataColumn(label: Text('TRẠNG THÁI')),
-                                      DataColumn(label: Text('TÁC VỤ')),
+                                    columns: [
+                                      DataColumn(label: Text('cases.table.code'.tr)),
+                                      DataColumn(label: Text('cases.table.title'.tr)),
+                                      DataColumn(label: Text('cases.table.station'.tr)),
+                                      DataColumn(label: Text('cases.table.area'.tr)),
+                                      DataColumn(label: Text('cases.table.createdAt'.tr)),
+                                      DataColumn(label: Text('cases.table.status'.tr)),
+                                      DataColumn(label: Text('cases.table.actions'.tr)),
                                     ],
                                     rows: list.map((e) {
-                                      final status = (e.status?.isNotEmpty ?? false) ? e.status! : 'Đang thụ lý';
+                                      final rawStatus = (e.status?.isNotEmpty ?? false) ? e.status! : 'Đang thụ lý';
+                                      final status = switch (rawStatus) {
+                                        'Đang thụ lý' => 'cases.status.inProgress'.tr,
+                                        'Hoàn thành' => 'cases.status.completed'.tr,
+                                        _ => rawStatus,
+                                      };
                                       final station = (e.stationName?.isNotEmpty ?? false) ? e.stationName! : '-';
                                       return DataRow(cells: [
-                                        DataCell(Text(e.incidentId.isEmpty ? '-' : e.incidentId.substring(0, 6))),
+                                        DataCell(Text(e.incidentId.isEmpty ? '-' : e.incidentId)),
                                         DataCell(
                                           ConstrainedBox(
                                             constraints: const BoxConstraints(minWidth: 360, maxWidth: 520),
@@ -342,28 +379,110 @@ class CaseListView extends GetView<CaseListController> {
   Future<bool?> _confirmDelete(BuildContext context, String title) {
     return showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          child: Padding(
-            padding: const EdgeInsets.all(18),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            color: Colors.white,
+            constraints: const BoxConstraints(maxWidth: 480),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Xoá chuyên án', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                Text('Bạn chắc chắn muốn xoá: "$title"?', style: const TextStyle(color: Colors.black87)),
-                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.delete_outline, color: Colors.red.shade700, size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Text(
+                        'Xoá chuyên án',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Bạn có chắc chắn muốn xoá chuyên án này không?',
+                  style: TextStyle(fontSize: 15, color: Colors.grey.shade700, height: 1.5),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.folder_outlined, color: Colors.grey.shade600, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xoá vĩnh viễn.',
+                          style: TextStyle(fontSize: 13, color: Colors.orange.shade900, height: 1.4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Hủy')),
-                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Hủy', style: TextStyle(fontSize: 15)),
+                    ),
+                    const SizedBox(width: 12),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700, foregroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade600,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        elevation: 0,
+                      ),
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Xoá'),
+                      child: const Text('Xác nhận xoá', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ),
@@ -784,11 +903,30 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
     return lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.png') || lower.endsWith('.webp') || lower.endsWith('.gif');
   }
 
+  List<PlatformFile> _mergePickedFiles(List<PlatformFile> existing, List<PlatformFile> incoming) {
+    final out = <PlatformFile>[...existing];
+
+    bool exists(PlatformFile f) {
+      return out.any((e) {
+        final sameName = e.name == f.name;
+        final sameSize = e.size == f.size;
+        final sameId = (e.identifier != null && f.identifier != null && e.identifier == f.identifier);
+        final samePath = (e.path != null && f.path != null && e.path == f.path);
+        return (sameId || samePath) || (sameName && sameSize);
+      });
+    }
+
+    for (final f in incoming) {
+      if (!exists(f)) out.add(f);
+    }
+    return out;
+  }
+
   Future<void> _pickEvidence() async {
     final result = await FilePicker.platform.pickFiles(allowMultiple: true, withData: true);
     if (result == null) return;
     setState(() {
-      _newEvidenceFiles = result.files;
+      _newEvidenceFiles = _mergePickedFiles(_newEvidenceFiles, result.files);
     });
   }
 
@@ -1165,6 +1303,25 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
                       if (_newEvidenceFiles.isNotEmpty) ...[
                         const SizedBox(height: 10),
                         Text('Tệp mới: ${_newEvidenceFiles.length}', style: TextStyle(color: Colors.grey.shade700)),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: _newEvidenceFiles
+                              .map((f) => Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(999),
+                                      border: Border.all(color: Colors.grey.shade200),
+                                    ),
+                                    child: Text(
+                                      f.name,
+                                      style: const TextStyle(fontSize: 11),
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
                       ],
 
                       const SizedBox(height: 16),

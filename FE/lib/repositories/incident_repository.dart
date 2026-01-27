@@ -8,11 +8,18 @@ class IncidentRepository {
   final ApiService api;
   IncidentRepository(this.api);
 
-  Future<List<IncidentModel>> list({String stationId = '', int year = 0, String status = '', String title = ''}) async {
+  Future<List<IncidentModel>> list({
+    String stationId = '', 
+    int year = 0, 
+    String status = '', 
+    String incidentType = '',
+    String title = ''
+  }) async {
     final query = <String, dynamic>{};
     if (stationId.isNotEmpty) query['station_id'] = stationId;
     if (year > 0) query['year'] = year;
     if (status.isNotEmpty) query['status'] = status;
+    if (incidentType.isNotEmpty) query['incident_type'] = incidentType;
     if (title.trim().isNotEmpty) query['title'] = title.trim();
 
     final res = await api.get(Endpoints.incidentList, query: query.isEmpty ? null : query);

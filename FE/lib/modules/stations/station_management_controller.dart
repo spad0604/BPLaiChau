@@ -70,15 +70,17 @@ class StationManagementController extends BaseController {
     }
   }
 
-  Future<void> updateStation(String id, Map<String, dynamic> updates) async {
+  Future<bool> updateStation(String id, Map<String, dynamic> updates) async {
     setLoading(true);
     try {
       await _repo.update(id, updates);
       await fetch();
       await _notifyStationsChanged();
       showSuccess('Đã cập nhật đồn');
+      return true;
     } catch (e) {
       showError(e.toString());
+      return false;
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,4 @@
 from typing import Dict, List, Optional, Any
-from uuid import uuid4
 from datetime import datetime
 from psycopg2.extras import RealDictCursor, Json
 
@@ -16,6 +15,41 @@ class IncidentService:
 
     def _db(self):
         return try_get_connection()
+    
+    def _generate_incident_id(self) -> str:
+        """Generate sequential incident ID based on year (e.g., 012026, 022026)"""
+        conn = self._db()
+        if conn is None:
+            # Fallback to timestamp-based ID
+            return datetime.utcnow().strftime("%m%d%H%M%S")
+        
+        try:
+            year = datetime.utcnow().year
+            with conn.cursor() as cur:
+                # Get the highest sequence number for this year
+                cur.execute(
+                    """
+                    SELECT incident_id FROM incidents 
+                    WHERE incident_id ~ '^[0-9]{6}$' 
+                    AND RIGHT(incident_id, 4) = %s
+                    ORDER BY incident_id DESC 
+                    LIMIT 1
+                    """,
+                    (str(year),)
+                )
+                row = cur.fetchone()
+                if row:
+                    last_id = row[0]
+                    seq = int(last_id[:2]) + 1
+                else:
+                    seq = 1
+                
+                return f"{seq:02d}{year}"
+        except Exception:
+            # Fallback
+            return datetime.utcnow().strftime("%m%d%H%M%S")
+        finally:
+            conn.close()
 
     def _row_to_incident_dict(self, row: Any) -> Dict[str, Any]:
         if isinstance(row, dict):
@@ -44,7 +78,7 @@ class IncidentService:
                 incident = Incident(**payload)
 
             if not incident.incident_id:
-                incident.incident_id = uuid4().hex
+                incident.incident_id = self._generate_incident_id()
             if not incident.created_at:
                 incident.created_at = datetime.utcnow().isoformat()
             # evidence must always be a list
@@ -132,6 +166,7 @@ class IncidentService:
         station_id: str = "",
         year: int = 0,
         status: str = "",
+        incident_type: str = "",
         title: str = "",
     ) -> BaseResponse:
         conn = self._db()
@@ -150,6 +185,9 @@ class IncidentService:
                     if status:
                         where_parts.append("status = %s")
                         params.append(status)
+                    if incident_type:
+                        where_parts.append("incident_type = %s")
+                        params.append(incident_type)
                     if title:
                         where_parts.append("title ilike %s")
                         params.append(f"%{title}%")

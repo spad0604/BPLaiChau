@@ -225,13 +225,13 @@ class StationManagementView extends GetView<StationManagementController> {
                       const SizedBox(width: 10),
                       ElevatedButton(
                         onPressed: () async {
-                          Navigator.of(ctx).pop();
-                          await controller.updateStation(station.stationId, {
+                          final ok = await controller.updateStation(station.stationId, {
                             'name': nameCtrl.text.trim(),
                             'code': codeCtrl.text.trim(),
                             'address': addressCtrl.text.trim(),
                             'phone': phoneCtrl.text.trim(),
                           });
+                          if (ok && ctx.mounted) Navigator.of(ctx).pop();
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1B4D3E), foregroundColor: Colors.white),
                         child: const Text('Lưu'),

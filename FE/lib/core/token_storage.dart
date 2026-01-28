@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenStorage {
@@ -27,7 +28,7 @@ class TokenStorage {
     } catch (e) {
       // Ignore SharedPreferences errors on web initial load
       // This can happen if storage is not available
-      print('TokenStorage init error: $e');
+      if (kDebugMode) debugPrint('TokenStorage init error: $e');
     }
   }
 
@@ -47,7 +48,7 @@ class TokenStorage {
         await prefs.remove(_roleKey);
       }
     } catch (e) {
-      print('TokenStorage save error: $e');
+      if (kDebugMode) debugPrint('TokenStorage save error: $e');
     }
   }
 
@@ -64,7 +65,7 @@ class TokenStorage {
       await prefs.remove(_roleKey);
       await prefs.remove(_rememberMeKey);
     } catch (e) {
-      print('TokenStorage clear error: $e');
+      if (kDebugMode) debugPrint('TokenStorage clear error: $e');
     }
   }
 

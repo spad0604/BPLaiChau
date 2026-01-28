@@ -47,7 +47,7 @@ class AppTranslations extends Translations {
           'sidebar.cases': 'Danh sách chuyên án',
           'sidebar.createCase': 'Thêm chuyên án',
           'sidebar.stations': 'Quản lý đồn biên phòng',
-          'sidebar.userManagement': 'Quản lý cán bộ',
+          'sidebar.userManagement': 'Quản lý người dùng',
           'sidebar.banners': 'Quản lý banner',
 
           // Dashboard titles/breadcrumbs
@@ -57,8 +57,8 @@ class AppTranslations extends Translations {
           'nav.title.createCase': 'Thêm vụ việc mới',
           'nav.breadcrumb.stations': 'Hệ thống  /  Danh mục  /  Đồn biên phòng',
           'nav.title.stations': 'Quản lý đồn biên phòng',
-          'nav.breadcrumb.users': 'Hệ thống  /  Quản lý cán bộ',
-          'nav.title.users': 'Quản lý cán bộ',
+          'nav.breadcrumb.users': 'Hệ thống  /  Quản lý người dùng',
+          'nav.title.users': 'Quản lý người dùng',
           'nav.breadcrumb.banners': 'Hệ thống  /  Banner',
           'nav.title.banners': 'Quản lý banner',
 

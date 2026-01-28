@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'routes/app_pages.dart';
@@ -43,6 +45,13 @@ class MyApp extends StatelessWidget {
       translations: AppTranslations(),
       locale: AppTranslations.viVN,
       fallbackLocale: AppTranslations.viVN,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('vi'), Locale('en')],
       builder: EasyLoading.init(),
     );
   }
@@ -58,25 +67,19 @@ class AuthChecker extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
-        
+
         // Navigate to appropriate page after loading token
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final initialRoute = TokenStorage.instance.isAuthenticated 
-              ? Routes.dashboard 
+          final initialRoute = TokenStorage.instance.isAuthenticated
+              ? Routes.dashboard
               : Routes.login;
           Get.offAllNamed(initialRoute);
         });
-        
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
+
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
   }

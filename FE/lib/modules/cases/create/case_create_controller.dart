@@ -9,6 +9,8 @@ import '../../../models/station_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../dashboard/dashboard_nav_controller.dart';
 import '../list/case_list_controller.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class CaseCreateController extends BaseController {
   final IncidentRepository _repo;
@@ -22,7 +24,7 @@ class CaseCreateController extends BaseController {
 
   final titleCtrl = TextEditingController();
   final locationCtrl = TextEditingController();
-  final descriptionCtrl = TextEditingController();
+  final descriptionCtrl = QuillController.basic();
 
   final dateTextCtrl = TextEditingController();
   Worker? _dateWorker;
@@ -42,8 +44,8 @@ class CaseCreateController extends BaseController {
   final noteCtrl = TextEditingController();
 
   // Criminal
-  final handlingMeasureCtrl = TextEditingController();
-  final prosecutedBehaviorCtrl = TextEditingController();
+  final handlingMeasureCtrl = QuillController.basic();
+  final prosecutedBehaviorCtrl = QuillController.basic();
 
   final RxList<SeizedItemForm> seizedItems = <SeizedItemForm>[].obs;
 
@@ -60,9 +62,13 @@ class CaseCreateController extends BaseController {
       if (d == null) {
         dateTextCtrl.text = '';
       } else {
-        dateTextCtrl.text = '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+        dateTextCtrl.text =
+            '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
       }
     });
+
+    // Disable adding new lines on Enter for single-line inputs if we wanted to enforce it,
+    // but these are multi-line fields so defaults are fine.
   }
 
   Future<void> pickEvidenceFiles() async {
@@ -127,22 +133,40 @@ class CaseCreateController extends BaseController {
     if (picked != null) date.value = picked;
   }
 
+  String _quillToHtml(QuillController controller) {
+    if (controller.document.isEmpty()) return '';
+    final delta = controller.document.toDelta().toJson();
+    final converter = QuillDeltaToHtmlConverter(
+      delta,
+      ConverterOptions.forEmail(),
+    );
+    return converter.convert();
+  }
+
   Future<void> submit() async {
-    if (titleCtrl.text.trim().isEmpty || locationCtrl.text.trim().isEmpty || descriptionCtrl.text.trim().isEmpty) {
+    // Validate Quill content manually since we can't use Form validator easily
+    final descHtml = _quillToHtml(descriptionCtrl);
+    final descPlainText = descriptionCtrl.document.toPlainText().trim();
+
+    if (titleCtrl.text.trim().isEmpty ||
+        locationCtrl.text.trim().isEmpty ||
+        descPlainText.isEmpty) {
       showError('Vui lòng nhập đủ: tiêu đề, địa bàn, nội dung');
       return;
     }
 
     setLoading(true);
     try {
-      final selectedStation = stations.firstWhereOrNull((s) => s.stationId == stationId.value);
+      final selectedStation = stations.firstWhereOrNull(
+        (s) => s.stationId == stationId.value,
+      );
       final payload = <String, dynamic>{
         'incident_type': incidentType.value,
         'severity': severity.value,
         'occurred_at': date.value?.toIso8601String() ?? '',
         'title': titleCtrl.text.trim(),
         'location': locationCtrl.text.trim(),
-        'description': descriptionCtrl.text.trim(),
+        'description': descHtml,
         'station_id': stationId.value,
         'station_name': selectedStation?.name ?? '',
       };
@@ -152,9 +176,13 @@ class CaseCreateController extends BaseController {
             .map((f) => f.toJson())
             .where((m) => (m['name'] as String).trim().isNotEmpty)
             .toList();
+
+        final handlingHtml = _quillToHtml(handlingMeasureCtrl);
+        final prosecutedHtml = _quillToHtml(prosecutedBehaviorCtrl);
+
         payload.addAll({
-          'handling_measure': handlingMeasureCtrl.text.trim(),
-          'prosecuted_behavior': prosecutedBehaviorCtrl.text.trim(),
+          'handling_measure': handlingHtml,
+          'prosecuted_behavior': prosecutedHtml,
           'seized_items': items,
         });
       } else {
@@ -172,8 +200,14 @@ class CaseCreateController extends BaseController {
       }
 
       if (pickedFiles.isNotEmpty) {
-        await _repo.uploadEvidenceFiles(created.incidentId, pickedFiles.toList());
+        await _repo.uploadEvidenceFiles(
+          created.incidentId,
+          pickedFiles.toList(),
+        );
       }
+
+      // Clear all form fields after successful creation
+      _clearForm();
 
       // If running inside DashboardShell, refresh list and switch tab.
       if (Get.isRegistered<DashboardNavController>()) {
@@ -191,6 +225,34 @@ class CaseCreateController extends BaseController {
     } finally {
       setLoading(false);
     }
+  }
+
+  void _clearForm() {
+    titleCtrl.clear();
+    locationCtrl.clear();
+    descriptionCtrl.clear();
+    dateTextCtrl.clear();
+    date.value = null;
+
+    resultsCtrl.clear();
+    punishmentCtrl.clear();
+    penaltyCtrl.clear();
+    noteCtrl.clear();
+
+    handlingMeasureCtrl.clear();
+    prosecutedBehaviorCtrl.clear();
+
+    pickedFiles.clear();
+
+    for (final item in seizedItems) {
+      item.dispose();
+    }
+    seizedItems.clear();
+    addSeizedItem();
+
+    incidentType.value = 'criminal';
+    severity.value = 'medium';
+    stationId.value = '';
   }
 
   @override

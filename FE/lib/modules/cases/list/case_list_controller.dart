@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../../core/base_controller.dart';
@@ -10,6 +11,8 @@ class CaseListController extends BaseController {
   final IncidentRepository _repo;
   final StationRepository _stationRepo;
   CaseListController(this._repo, this._stationRepo);
+
+  final ScrollController tableHorizontalController = ScrollController();
 
   final RxList<IncidentModel> items = <IncidentModel>[].obs;
   final RxString query = ''.obs;
@@ -136,6 +139,7 @@ class CaseListController extends BaseController {
   void onClose() {
     _queryWorker?.dispose();
     _filtersWorker?.dispose();
+    tableHorizontalController.dispose();
     super.onClose();
   }
 }

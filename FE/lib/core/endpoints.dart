@@ -3,7 +3,8 @@ class Endpoints {
   // Change this value once for all requests. Use emulator loopback for Android emulator.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://repository-moses-tears-browsing.trycloudflare.com/api',
+    defaultValue:
+        'https://repository-moses-tears-browsing.trycloudflare.com/api',
   );
 
   // Auth
@@ -34,4 +35,9 @@ class Endpoints {
   // Banners
   static const String banners = '/banners';
   static const String bannerById = '/banners/{id}';
+
+  // Legal Documents
+  static const String legalDocuments = '/legal-documents';
+  static const String legalDocumentById = '/legal-documents/{id}';
+  static const String legalDocumentUpload = '/legal-documents/upload';
 }

@@ -20,6 +20,8 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_delta_from_html/flutter_quill_delta_from_html.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 import '../../../widgets/app_rich_editor.dart';
+import '../../../core/url_helper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CaseListView extends GetView<CaseListController> {
   final bool embedded;
@@ -560,7 +562,7 @@ class CaseListView extends GetView<CaseListController> {
         children: [
           const DashboardTopBar(
             breadcrumb: 'Trang chủ  /  Quản lý chuyên án',
-            title: 'Danh sách chuyên án',
+            title: 'Danh sách vụ việc',
           ),
           Expanded(child: content),
         ],
@@ -832,6 +834,34 @@ class _CaseDetailDialog extends StatelessWidget {
         lower.endsWith('.gif');
   }
 
+  IconData _getFileIcon(String url) {
+    final lower = url.toLowerCase();
+    if (lower.endsWith('.pdf')) return Icons.picture_as_pdf;
+    if (lower.endsWith('.doc') || lower.endsWith('.docx'))
+      return Icons.description;
+    if (lower.endsWith('.xls') || lower.endsWith('.xlsx'))
+      return Icons.table_chart;
+    return Icons.insert_drive_file;
+  }
+
+  Color _getFileColor(String url) {
+    final lower = url.toLowerCase();
+    if (lower.endsWith('.pdf')) return Colors.red;
+    if (lower.endsWith('.doc') || lower.endsWith('.docx')) return Colors.blue;
+    if (lower.endsWith('.xls') || lower.endsWith('.xlsx')) return Colors.green;
+    return Colors.grey;
+  }
+
+  String _getFileName(String url) {
+    final parts = url.split('/');
+    if (parts.isEmpty) return 'File';
+    final fileName = parts.last;
+    if (fileName.length > 20) {
+      return '${fileName.substring(0, 17)}...';
+    }
+    return fileName;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -1087,7 +1117,7 @@ class _CaseDetailDialog extends StatelessWidget {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.network(
-                                    url,
+                                    UrlHelper.toAbsoluteUrl(url),
                                     fit: BoxFit.cover,
                                     errorBuilder: (c, e, st) => Center(
                                       child: Icon(
@@ -1098,25 +1128,68 @@ class _CaseDetailDialog extends StatelessWidget {
                                   ),
                                 ),
                               );
-                            }
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
+                            } else {
+                              // Non-image file (Word, PDF, etc.)
+                              return InkWell(
+                                onTap: () async {
+                                  final uri = Uri.parse(
+                                    UrlHelper.toAbsoluteUrl(url),
+                                  );
+                                  try {
+                                    await launchUrl(
+                                      uri,
+                                      mode: LaunchMode.externalApplication,
+                                    );
+                                  } catch (e) {
+                                    Get.snackbar(
+                                      'Lỗi',
+                                      'Không thể mở file: $e',
+                                      backgroundColor: Colors.red.shade100,
+                                      colorText: Colors.red.shade900,
+                                      snackPosition: SnackPosition.BOTTOM,
+                                    );
+                                  }
+                                },
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey.shade200),
-                              ),
-                              child: SelectableText(
-                                url,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black87,
+                                child: Container(
+                                  width: 170,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade50,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.grey.shade200,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        _getFileIcon(url),
+                                        size: 40,
+                                        color: _getFileColor(url),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                        ),
+                                        child: Text(
+                                          _getFileName(url),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
                           }).toList(),
                         ),
 
@@ -1175,13 +1248,13 @@ class _CaseDetailDialog extends StatelessWidget {
   static String _severityLabelStatic(String? v) {
     switch ((v ?? '').toLowerCase()) {
       case 'low':
-        return 'Thấp';
+        return 'Ít nghiêm trọng';
       case 'medium':
-        return 'Trung bình';
+        return 'Nghiêm trọng';
       case 'high':
-        return 'Cao';
-      case 'critical':
         return 'Rất nghiêm trọng';
+      case 'critical':
+        return 'Đặc biệt nghiêm trọng';
       default:
         return (v == null || v.isEmpty) ? '-' : v;
     }
@@ -1278,6 +1351,34 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
         lower.endsWith('.gif');
   }
 
+  IconData _getFileIcon(String url) {
+    final lower = url.toLowerCase();
+    if (lower.endsWith('.pdf')) return Icons.picture_as_pdf;
+    if (lower.endsWith('.doc') || lower.endsWith('.docx'))
+      return Icons.description;
+    if (lower.endsWith('.xls') || lower.endsWith('.xlsx'))
+      return Icons.table_chart;
+    return Icons.insert_drive_file;
+  }
+
+  Color _getFileColor(String url) {
+    final lower = url.toLowerCase();
+    if (lower.endsWith('.pdf')) return Colors.red;
+    if (lower.endsWith('.doc') || lower.endsWith('.docx')) return Colors.blue;
+    if (lower.endsWith('.xls') || lower.endsWith('.xlsx')) return Colors.green;
+    return Colors.grey;
+  }
+
+  String _getFileName(String url) {
+    final parts = url.split('/');
+    if (parts.isEmpty) return 'File';
+    final fileName = parts.last;
+    if (fileName.length > 20) {
+      return '${fileName.substring(0, 17)}...';
+    }
+    return fileName;
+  }
+
   String _quillToHtml(QuillController controller) {
     if (controller.document.isEmpty()) return '';
     final delta = controller.document.toDelta().toJson();
@@ -1317,6 +1418,8 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       withData: true,
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
     );
     if (result == null) return;
     setState(() {
@@ -1447,12 +1550,22 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
                       (detail['description']?.toString().isNotEmpty ?? false)
                       ? detail['description'].toString()
                       : (widget.row?.description ?? '');
-                  _descriptionCtrl = QuillController(
-                    document: Document.fromDelta(
-                      HtmlToDelta().convert(descHtml),
-                    ),
-                    selection: const TextSelection.collapsed(offset: 0),
-                  );
+
+                  if (descHtml.isEmpty) {
+                    _descriptionCtrl = QuillController.basic();
+                  } else {
+                    try {
+                      _descriptionCtrl = QuillController(
+                        document: Document.fromDelta(
+                          HtmlToDelta().convert(descHtml),
+                        ),
+                        selection: const TextSelection.collapsed(offset: 0),
+                      );
+                    } catch (_) {
+                      _descriptionCtrl = QuillController.basic();
+                    }
+                  }
+
                   _status = (detail['status']?.toString().isNotEmpty ?? false)
                       ? detail['status'].toString()
                       : ((widget.row?.status?.isNotEmpty ?? false)
@@ -1477,21 +1590,37 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
 
                   final handlingHtml =
                       detail['handling_measure']?.toString() ?? '';
-                  _handlingCtrl = QuillController(
-                    document: Document.fromDelta(
-                      HtmlToDelta().convert(handlingHtml),
-                    ),
-                    selection: const TextSelection.collapsed(offset: 0),
-                  );
+                  if (handlingHtml.isEmpty) {
+                    _handlingCtrl = QuillController.basic();
+                  } else {
+                    try {
+                      _handlingCtrl = QuillController(
+                        document: Document.fromDelta(
+                          HtmlToDelta().convert(handlingHtml),
+                        ),
+                        selection: const TextSelection.collapsed(offset: 0),
+                      );
+                    } catch (_) {
+                      _handlingCtrl = QuillController.basic();
+                    }
+                  }
 
                   final prosecutedHtml =
                       detail['prosecuted_behavior']?.toString() ?? '';
-                  _prosecutedCtrl = QuillController(
-                    document: Document.fromDelta(
-                      HtmlToDelta().convert(prosecutedHtml),
-                    ),
-                    selection: const TextSelection.collapsed(offset: 0),
-                  );
+                  if (prosecutedHtml.isEmpty) {
+                    _prosecutedCtrl = QuillController.basic();
+                  } else {
+                    try {
+                      _prosecutedCtrl = QuillController(
+                        document: Document.fromDelta(
+                          HtmlToDelta().convert(prosecutedHtml),
+                        ),
+                        selection: const TextSelection.collapsed(offset: 0),
+                      );
+                    } catch (_) {
+                      _prosecutedCtrl = QuillController.basic();
+                    }
+                  }
                   _resultsCtrl.text = detail['results']?.toString() ?? '';
                   _punishmentCtrl.text =
                       detail['form_of_punishment']?.toString() ?? '';
@@ -1535,7 +1664,7 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
                         children: [
                           const Expanded(
                             child: Text(
-                              'Sửa chuyên án',
+                              'Sửa vụ việc',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -1606,18 +1735,24 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: AppDropdown<String>(
-                              label: 'Cấp độ',
+                              label: "Nhóm 'tội phạm'",
                               value: _severity,
                               items: const [
-                                AppDropdownItem(value: 'low', label: 'Thấp'),
+                                AppDropdownItem(
+                                  value: 'low',
+                                  label: 'Ít nghiêm trọng',
+                                ),
                                 AppDropdownItem(
                                   value: 'medium',
-                                  label: 'Trung bình',
+                                  label: 'Nghiêm trọng',
                                 ),
-                                AppDropdownItem(value: 'high', label: 'Cao'),
+                                AppDropdownItem(
+                                  value: 'high',
+                                  label: 'Rất nghiêm trọng',
+                                ),
                                 AppDropdownItem(
                                   value: 'critical',
-                                  label: 'Rất nghiêm trọng',
+                                  label: 'Đặc biệt nghiêm trọng',
                                 ),
                               ],
                               onChanged: (v) => setState(() => _severity = v),
@@ -1857,7 +1992,7 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
                                     borderRadius: BorderRadius.circular(10),
                                     child: _isImageUrl(url)
                                         ? Image.network(
-                                            url,
+                                            UrlHelper.toAbsoluteUrl(url),
                                             fit: BoxFit.cover,
                                             errorBuilder: (c, e, st) => Center(
                                               child: Icon(
@@ -1867,16 +2002,34 @@ class _CaseEditDialogState extends State<_CaseEditDialog> {
                                             ),
                                           )
                                         : Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Text(
-                                                url,
-                                                maxLines: 3,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 12,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  _getFileIcon(url),
+                                                  size: 32,
+                                                  color: _getFileColor(url),
                                                 ),
-                                              ),
+                                                const SizedBox(height: 6),
+                                                Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    4,
+                                                  ),
+                                                  child: Text(
+                                                    _getFileName(url),
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      color:
+                                                          Colors.grey.shade700,
+                                                    ),
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                   ),

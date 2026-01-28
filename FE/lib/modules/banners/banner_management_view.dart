@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/token_storage.dart';
+import '../../core/url_helper.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/dashboard/dashboard_layout.dart';
 import '../../widgets/dashboard/sidebar.dart';
@@ -24,14 +25,19 @@ class BannerManagementView extends GetView<BannerManagementController> {
           Row(
             children: [
               const Expanded(
-                child: Text('Banner màn hình đăng nhập', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Banner màn hình đăng nhập',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
               if (_isSuperAdmin)
-                Obx(() => AppButton(
-                      text: 'Tải banner',
-                      onPressed: controller.uploadOne,
-                      isLoading: controller.isLoadingRx.value,
-                    )),
+                Obx(
+                  () => AppButton(
+                    text: 'Tải banner',
+                    onPressed: controller.uploadOne,
+                    isLoading: controller.isLoadingRx.value,
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -39,16 +45,23 @@ class BannerManagementView extends GetView<BannerManagementController> {
             child: Obx(() {
               final list = controller.items.toList();
               if (list.isEmpty) {
-                return Center(child: Text('Chưa có banner', style: TextStyle(color: Colors.grey.shade600)));
+                return Center(
+                  child: Text(
+                    'Chưa có banner',
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                );
               }
               return ListView.separated(
                 itemCount: list.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
                 itemBuilder: (context, i) {
                   final b = list[i];
                   final id = (b['banner_id'] ?? '').toString();
                   final url = (b['image_url'] ?? '').toString();
                   final title = (b['banner_title'] ?? '').toString();
+                  final absoluteUrl = UrlHelper.toAbsoluteUrl(url);
                   return Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -68,7 +81,12 @@ class BannerManagementView extends GetView<BannerManagementController> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.network(url, fit: BoxFit.cover, errorBuilder: (c, e, st) => const Icon(Icons.broken_image)),
+                            child: Image.network(
+                              absoluteUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (c, e, st) =>
+                                  const Icon(Icons.broken_image),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 14),
@@ -76,11 +94,25 @@ class BannerManagementView extends GetView<BannerManagementController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(title.isEmpty ? 'Không có tiêu đề' : title, style: const TextStyle(fontWeight: FontWeight.w700)),
+                              Text(
+                                title.isEmpty ? 'Không có tiêu đề' : title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                               const SizedBox(height: 6),
-                              Text(id, style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+                              Text(
+                                id,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
                               const SizedBox(height: 6),
-                              SelectableText(url, style: const TextStyle(fontSize: 12)),
+                              SelectableText(
+                                url,
+                                style: const TextStyle(fontSize: 12),
+                              ),
                             ],
                           ),
                         ),
@@ -92,14 +124,24 @@ class BannerManagementView extends GetView<BannerManagementController> {
                                 context: context,
                                 builder: (_) => AlertDialog(
                                   title: const Text('Xoá banner'),
-                                  content: const Text('Bạn chắc chắn muốn xoá banner này?'),
+                                  content: const Text(
+                                    'Bạn chắc chắn muốn xoá banner này?',
+                                  ),
                                   actions: [
-                                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Hủy')),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: const Text('Hủy'),
+                                    ),
                                     ElevatedButton(
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                                      onPressed: () => Navigator.pop(context, true),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
                                       child: const Text('Xoá'),
-                                    )
+                                    ),
                                   ],
                                 ),
                               );
@@ -107,7 +149,10 @@ class BannerManagementView extends GetView<BannerManagementController> {
                                 await controller.deleteBanner(id);
                               }
                             },
-                            icon: const Icon(Icons.delete_outline, color: Colors.red),
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                            ),
                           ),
                       ],
                     ),
@@ -126,7 +171,10 @@ class BannerManagementView extends GetView<BannerManagementController> {
       active: SidebarItemKey.banners,
       child: Column(
         children: [
-          const DashboardTopBar(breadcrumb: 'Hệ thống  /  Banner', title: 'Quản lý banner'),
+          const DashboardTopBar(
+            breadcrumb: 'Hệ thống  /  Banner',
+            title: 'Quản lý banner',
+          ),
           Expanded(child: body),
         ],
       ),

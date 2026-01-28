@@ -41,7 +41,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                     Expanded(
                       child: AppTextField(
                         label: 'Ngày xảy ra',
-                        hint: 'mm/dd/yyyy',
+                        hint: '',
                         controller: controller.dateTextCtrl,
                         readOnly: true,
                         onTap: () => controller.pickDate(context),
@@ -52,7 +52,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                     Expanded(
                       child: AppTextField(
                         label: 'Địa bàn',
-                        hint: 'Ví dụ: xã Pa Vây Sử, huyện Phong Thổ...',
+                        hint: '',
                         controller: controller.locationCtrl,
                         prefixIcon: Icons.location_on_outlined,
                       ),
@@ -85,18 +85,24 @@ class CaseCreateView extends GetView<CaseCreateController> {
                     Expanded(
                       child: Obx(
                         () => AppDropdown<String>(
-                          label: 'Cấp độ',
+                          label: "Nhóm 'tội phạm'",
                           value: controller.severity.value,
                           items: const [
-                            AppDropdownItem(value: 'low', label: 'Thấp'),
+                            AppDropdownItem(
+                              value: 'low',
+                              label: 'Ít nghiêm trọng',
+                            ),
                             AppDropdownItem(
                               value: 'medium',
-                              label: 'Trung bình',
+                              label: 'Nghiêm trọng',
                             ),
-                            AppDropdownItem(value: 'high', label: 'Cao'),
+                            AppDropdownItem(
+                              value: 'high',
+                              label: 'Rất nghiêm trọng',
+                            ),
                             AppDropdownItem(
                               value: 'critical',
-                              label: 'Rất nghiêm trọng',
+                              label: 'Đặc biệt nghiêm trọng',
                             ),
                           ],
                           onChanged: (v) => controller.severity.value = v,
@@ -136,7 +142,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
               children: [
                 AppTextField(
                   label: 'Tiêu đề vụ việc',
-                  hint: 'Ví dụ: Vận chuyển ma túy trái phép',
+                  hint: '',
                   controller: controller.titleCtrl,
                   prefixIcon: Icons.title,
                 ),
@@ -203,8 +209,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                                       flex: 3,
                                       child: AppTextField(
                                         label: i == 0 ? 'Tên tang chứng' : '',
-                                        hint:
-                                            'Ví dụ: Heroin, xe máy, điện thoại...',
+                                        hint: '',
                                         controller: item.nameCtrl,
                                       ),
                                     ),
@@ -213,7 +218,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                                       flex: 2,
                                       child: AppTextField(
                                         label: i == 0 ? 'Số lượng' : '',
-                                        hint: 'VD: 1.2',
+                                        hint: '',
                                         controller: item.qtyCtrl,
                                         keyboardType: TextInputType.number,
                                       ),
@@ -223,7 +228,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                                       flex: 2,
                                       child: AppTextField(
                                         label: i == 0 ? 'Đơn vị' : '',
-                                        hint: 'gam/cái/gói...',
+                                        hint: '',
                                         controller: item.unitCtrl,
                                       ),
                                     ),
@@ -232,7 +237,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                                       flex: 3,
                                       child: AppTextField(
                                         label: i == 0 ? 'Ghi chú' : '',
-                                        hint: 'Tuỳ chọn',
+                                        hint: '',
                                         controller: item.noteCtrl,
                                       ),
                                     ),
@@ -258,7 +263,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                     children: [
                       AppTextField(
                         label: 'Kết quả giải quyết',
-                        hint: 'Ví dụ: Ra quyết định xử phạt...',
+                        hint: '',
                         controller: controller.resultsCtrl,
                         maxLines: 3,
                       ),
@@ -268,7 +273,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                           Expanded(
                             child: AppTextField(
                               label: 'Hình thức xử phạt',
-                              hint: 'Ví dụ: Phạt tiền, cảnh cáo...',
+                              hint: '',
                               controller: controller.punishmentCtrl,
                             ),
                           ),
@@ -276,7 +281,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                           Expanded(
                             child: AppTextField(
                               label: 'Mức phạt (VND)',
-                              hint: '0',
+                              hint: '',
                               controller: controller.penaltyCtrl,
                               keyboardType: TextInputType.number,
                             ),
@@ -286,7 +291,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                       const SizedBox(height: 16),
                       AppTextField(
                         label: 'Ghi chú',
-                        hint: 'Ví dụ: Có báo Cục...',
+                        hint: '',
                         controller: controller.noteCtrl,
                         maxLines: 2,
                       ),
@@ -298,13 +303,14 @@ class CaseCreateView extends GetView<CaseCreateController> {
           ),
           const SizedBox(height: 16),
           _SectionCard(
-            title: 'Tang chứng & Tài liệu',
+            title:
+                'Tang vật, phương tiện vi phạm hành chính, giấy phép chứng chỉ hành nghề bị tạm giữ theo thủ tục hành chính',
             icon: Icons.upload_file,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Upload tang chứng lên Cloudinary.',
+                  'Tải lên tài liệu, hình ảnh minh chứng.',
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 12),
@@ -374,7 +380,7 @@ class CaseCreateView extends GetView<CaseCreateController> {
                 }),
                 const SizedBox(height: 6),
                 const Text(
-                  'Hỗ trợ: jpg, png, pdf. Tối đa 10MB/tệp.',
+                  'Hỗ trợ: jpg, png, pdf, doc, docx.',
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
@@ -453,7 +459,12 @@ class _SectionCard extends StatelessWidget {
             children: [
               Icon(icon, color: const Color(0xFF1B4D3E)),
               const SizedBox(width: 10),
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 14),

@@ -9,6 +9,7 @@ import '../cases/create/case_create_controller.dart';
 import '../cases/list/case_list_controller.dart';
 import '../stations/station_management_controller.dart';
 import '../banners/banner_management_controller.dart';
+import '../legal_docs/legal_docs_controller.dart';
 import 'dashboard_nav_controller.dart';
 
 class DashboardBinding extends Bindings {
@@ -17,10 +18,32 @@ class DashboardBinding extends Bindings {
     Get.put(DashboardNavController(), permanent: true);
 
     // Controllers used inside the dashboard tabs
-    Get.lazyPut<CaseListController>(() => CaseListController(Get.find<IncidentRepository>(), Get.find<StationRepository>()), fenix: true);
-    Get.lazyPut<CaseCreateController>(() => CaseCreateController(Get.find<IncidentRepository>(), Get.find<StationRepository>()), fenix: true);
-    Get.lazyPut<StationManagementController>(() => StationManagementController(Get.find<StationRepository>()), fenix: true);
-    Get.lazyPut<UserManagementController>(() => UserManagementController(Get.find<AdminRepository>()), fenix: true);
-    Get.lazyPut<BannerManagementController>(() => BannerManagementController(Get.find<BannerRepository>()), fenix: true);
+    Get.lazyPut<CaseListController>(
+      () => CaseListController(
+        Get.find<IncidentRepository>(),
+        Get.find<StationRepository>(),
+      ),
+      fenix: true,
+    );
+    Get.lazyPut<CaseCreateController>(
+      () => CaseCreateController(
+        Get.find<IncidentRepository>(),
+        Get.find<StationRepository>(),
+      ),
+      fenix: true,
+    );
+    Get.lazyPut<StationManagementController>(
+      () => StationManagementController(Get.find<StationRepository>()),
+      fenix: true,
+    );
+    Get.lazyPut<UserManagementController>(
+      () => UserManagementController(Get.find<AdminRepository>()),
+      fenix: true,
+    );
+    Get.lazyPut<BannerManagementController>(
+      () => BannerManagementController(Get.find<BannerRepository>()),
+      fenix: true,
+    );
+    Get.lazyPut<LegalDocsController>(() => LegalDocsController(), fenix: true);
   }
 }

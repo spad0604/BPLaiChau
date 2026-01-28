@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 
 from app.core.db import try_get_connection
 from app.schemas.base_response import BaseResponse
-from app.services.cloudinary_service import upload_file
+from app.services.local_storage_service import upload_file
 
 
 class BackgroundBannerService:
@@ -68,7 +68,7 @@ class BackgroundBannerService:
         return BaseResponse(status=201, message="Banner created", data={"banner": record})
 
     def create_from_upload(self, file_obj, filename: Optional[str] = None, banner_title: str = "") -> BaseResponse:
-        url = upload_file(file_obj, folder="bplaichau/banners")
+        url = upload_file(file_obj, filename=filename, folder="bplaichau/banners")
         if not url:
             return BaseResponse(status=400, message="Upload failed", data=None)
         return self.create(image_url=url, banner_title=banner_title)

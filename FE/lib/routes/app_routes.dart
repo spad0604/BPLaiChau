@@ -8,4 +8,5 @@ abstract class Routes {
   static const stations = '/stations';
   static const userManagement = '/users';
   static const banners = '/banners';
+  static const legalDocs = '/legal-docs';
 }

@@ -9,6 +9,7 @@ import '../cases/create/case_create_view.dart';
 import '../cases/list/case_list_view.dart';
 import '../stations/station_management_view.dart';
 import '../banners/banner_management_view.dart';
+import '../legal_docs/legal_docs_view.dart';
 import 'dashboard_nav_controller.dart';
 
 class DashboardShell extends GetView<DashboardNavController> {
@@ -24,7 +25,10 @@ class DashboardShell extends GetView<DashboardNavController> {
         onSelect: controller.select,
         child: Column(
           children: [
-            DashboardTopBar(breadcrumb: controller.breadcrumb, title: controller.title),
+            DashboardTopBar(
+              breadcrumb: controller.breadcrumb,
+              title: controller.title,
+            ),
             Expanded(
               child: IndexedStack(
                 index: _indexOf(active),
@@ -34,6 +38,7 @@ class DashboardShell extends GetView<DashboardNavController> {
                   StationManagementView(embedded: true),
                   UserManagementView(embedded: true),
                   BannerManagementView(embedded: true),
+                  LegalDocsView(embedded: true),
                 ],
               ),
             ),
@@ -55,6 +60,8 @@ class DashboardShell extends GetView<DashboardNavController> {
         return 3;
       case SidebarItemKey.banners:
         return 4;
+      case SidebarItemKey.legalDocs:
+        return 5;
     }
   }
 }

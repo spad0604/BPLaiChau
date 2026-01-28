@@ -10,7 +10,8 @@ class DashboardNavController extends GetxController {
     active.value = key;
 
     // Ensure station dropdowns reflect newest data after station CRUD.
-    if (key == SidebarItemKey.createCase && Get.isRegistered<CaseCreateController>()) {
+    if (key == SidebarItemKey.createCase &&
+        Get.isRegistered<CaseCreateController>()) {
       Get.find<CaseCreateController>().reloadStations();
     }
     if (key == SidebarItemKey.cases && Get.isRegistered<CaseListController>()) {
@@ -30,6 +31,8 @@ class DashboardNavController extends GetxController {
         return 'nav.breadcrumb.users'.tr;
       case SidebarItemKey.banners:
         return 'nav.breadcrumb.banners'.tr;
+      case SidebarItemKey.legalDocs:
+        return 'nav.breadcrumb.legalDocs'.tr;
     }
   }
 
@@ -45,6 +48,8 @@ class DashboardNavController extends GetxController {
         return 'nav.title.users'.tr;
       case SidebarItemKey.banners:
         return 'nav.title.banners'.tr;
+      case SidebarItemKey.legalDocs:
+        return 'nav.title.legalDocs'.tr;
     }
   }
 }

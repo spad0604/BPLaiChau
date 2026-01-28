@@ -6,7 +6,7 @@ from app.models.user import UserRole
 from app.schemas.incident_schema import IncidentIn
 from app.schemas.base_response import BaseResponse
 from app.services.incident_service import incident_service
-from app.services.cloudinary_service import upload_file
+from app.services.local_storage_service import upload_file
 
 router = APIRouter()
 
@@ -57,14 +57,14 @@ async def delete_incident(incident_id: str, user=Depends(RoleChecker([UserRole.S
 
 @router.post("/{incident_id}/evidence")
 async def upload_evidence(incident_id: str, files: List[UploadFile] = File(...), user=Depends(RoleChecker([UserRole.ADMIN, UserRole.SUPER_ADMIN]))):
-    # upload files to Cloudinary and append urls to incident.evidence
+    # upload files to local storage and append urls to incident.evidence
     uploaded_urls = []
     for f in files:
         try:
             f.file.seek(0)
         except Exception:
             pass
-        url = upload_file(f.file, folder=f"bplaichau/incidents/{incident_id}")
+        url = upload_file(f.file, filename=f.filename, folder=f"bplaichau/incidents/{incident_id}")
         if url:
             uploaded_urls.append(url)
 

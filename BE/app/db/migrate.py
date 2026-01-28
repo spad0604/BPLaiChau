@@ -86,6 +86,19 @@ def init_db() -> None:
                     """
                 )
 
+                cur.execute(
+                    """
+                    create table if not exists legal_documents (
+                        document_id text primary key,
+                        title text not null,
+                        description text default '',
+                        file_url text not null,
+                        file_type text default '',
+                        created_at timestamptz default now()
+                    );
+                    """
+                )
+
                 # Backfill/upgrade: add status column if table already existed
                 cur.execute("alter table incidents add column if not exists status text default 'Đang thụ lý';")
     finally:

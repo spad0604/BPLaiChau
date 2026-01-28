@@ -21,6 +21,9 @@ class Settings:
 		self.DB_HOST: Optional[str] = os.getenv("DB_HOST")
 		self.DB_PORT: Optional[str] = os.getenv("DB_PORT")
 		self.DB_NAME: Optional[str] = os.getenv("DB_NAME")
+		
+		# Base URL for local files
+		self.BASE_URL: str = os.getenv("BASE_URL", "http://localhost:8000")
 
 		# parse DATABASE_URL into parts if present
 		self.parse_database()

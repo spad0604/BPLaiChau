@@ -3,7 +3,14 @@ import 'package:get/get.dart';
 import '../../routes/app_pages.dart';
 import '../../core/token_storage.dart';
 
-enum SidebarItemKey { cases, createCase, stations, userManagement, banners }
+enum SidebarItemKey {
+  cases,
+  createCase,
+  stations,
+  userManagement,
+  banners,
+  legalDocs,
+}
 
 class SidebarItem {
   final SidebarItemKey key;
@@ -11,7 +18,12 @@ class SidebarItem {
   final IconData icon;
   final String route;
 
-  const SidebarItem({required this.key, required this.titleKey, required this.icon, required this.route});
+  const SidebarItem({
+    required this.key,
+    required this.titleKey,
+    required this.icon,
+    required this.route,
+  });
 }
 
 class DashboardSidebar extends StatelessWidget {
@@ -21,18 +33,52 @@ class DashboardSidebar extends StatelessWidget {
   const DashboardSidebar({super.key, required this.active, this.onSelect});
 
   static const items = <SidebarItem>[
-    SidebarItem(key: SidebarItemKey.cases, titleKey: 'sidebar.cases', icon: Icons.folder_outlined, route: Routes.caseList),
-    SidebarItem(key: SidebarItemKey.createCase, titleKey: 'sidebar.createCase', icon: Icons.add_circle_outline, route: Routes.caseCreate),
-    SidebarItem(key: SidebarItemKey.stations, titleKey: 'sidebar.stations', icon: Icons.apartment_outlined, route: Routes.stations),
-    SidebarItem(key: SidebarItemKey.userManagement, titleKey: 'sidebar.userManagement', icon: Icons.people_outline, route: Routes.userManagement),
-    SidebarItem(key: SidebarItemKey.banners, titleKey: 'sidebar.banners', icon: Icons.image_outlined, route: Routes.banners),
+    SidebarItem(
+      key: SidebarItemKey.cases,
+      titleKey: 'sidebar.cases',
+      icon: Icons.folder_outlined,
+      route: Routes.caseList,
+    ),
+    SidebarItem(
+      key: SidebarItemKey.createCase,
+      titleKey: 'sidebar.createCase',
+      icon: Icons.add_circle_outline,
+      route: Routes.caseCreate,
+    ),
+    SidebarItem(
+      key: SidebarItemKey.stations,
+      titleKey: 'sidebar.stations',
+      icon: Icons.apartment_outlined,
+      route: Routes.stations,
+    ),
+    SidebarItem(
+      key: SidebarItemKey.userManagement,
+      titleKey: 'sidebar.userManagement',
+      icon: Icons.people_outline,
+      route: Routes.userManagement,
+    ),
+    SidebarItem(
+      key: SidebarItemKey.banners,
+      titleKey: 'sidebar.banners',
+      icon: Icons.image_outlined,
+      route: Routes.banners,
+    ),
+    SidebarItem(
+      key: SidebarItemKey.legalDocs,
+      titleKey: 'sidebar.legalDocs',
+      icon: Icons.gavel_outlined,
+      route: Routes.legalDocs,
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final role = (TokenStorage.instance.role ?? '');
     final visibleItems = items.where((it) {
-      if (it.key == SidebarItemKey.banners) return role == 'super_admin';
+      if (it.key == SidebarItemKey.banners ||
+          it.key == SidebarItemKey.legalDocs) {
+        return role == 'super_admin';
+      }
       return true;
     }).toList();
 
@@ -52,19 +98,31 @@ class DashboardSidebar extends StatelessWidget {
                 SizedBox(
                   width: 36,
                   height: 36,
-                  child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    fit: BoxFit.contain,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('sidebar.brandTitle'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        'sidebar.brandTitle'.tr,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       SizedBox(height: 2),
-                      Text('sidebar.brandSubtitle'.tr, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                      Text(
+                        'sidebar.brandSubtitle'.tr,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -73,7 +131,14 @@ class DashboardSidebar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('sidebar.section'.tr, style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
+              child: Text(
+                'sidebar.section'.tr,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -84,20 +149,37 @@ class DashboardSidebar extends StatelessWidget {
                 final item = visibleItems[index];
                 final isActive = item.key == active;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   child: ListTile(
                     dense: true,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    leading: Icon(item.icon, size: 20, color: isActive ? const Color(0xFF1B4D3E) : Colors.grey.shade700),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    leading: Icon(
+                      item.icon,
+                      size: 20,
+                      color: isActive
+                          ? const Color(0xFF1B4D3E)
+                          : Colors.grey.shade700,
+                    ),
                     title: Text(
                       item.titleKey.tr,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-                        color: isActive ? const Color(0xFF1B4D3E) : Colors.grey.shade800,
+                        fontWeight: isActive
+                            ? FontWeight.bold
+                            : FontWeight.w500,
+                        color: isActive
+                            ? const Color(0xFF1B4D3E)
+                            : Colors.grey.shade800,
                       ),
                     ),
-                    tileColor: isActive ? const Color(0xFFE8F3EF) : Colors.transparent,
+                    tileColor: isActive
+                        ? const Color(0xFFE8F3EF)
+                        : Colors.transparent,
                     onTap: () {
                       if (onSelect != null) {
                         onSelect!(item.key);
@@ -117,17 +199,32 @@ class DashboardSidebar extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                CircleAvatar(radius: 16, backgroundColor: Colors.grey.shade200, child: const Icon(Icons.person, size: 18)),
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.grey.shade200,
+                  child: const Icon(Icons.person, size: 18),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(TokenStorage.instance.username ?? 'Nguyễn Văn A', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      Text(
+                        TokenStorage.instance.username ?? 'Nguyễn Văn A',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 2),
                       Text(
-                        role == 'super_admin' ? 'role.superAdmin'.tr : 'role.admin'.tr,
-                        style: const TextStyle(fontSize: 10, color: Colors.grey),
+                        role == 'super_admin'
+                            ? 'role.superAdmin'.tr
+                            : 'role.admin'.tr,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -139,7 +236,7 @@ class DashboardSidebar extends StatelessWidget {
                     Get.offAllNamed(Routes.login);
                   },
                   icon: const Icon(Icons.logout, size: 18),
-                )
+                ),
               ],
             ),
           ),

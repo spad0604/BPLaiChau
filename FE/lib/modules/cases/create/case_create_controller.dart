@@ -76,6 +76,8 @@ class CaseCreateController extends BaseController {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: true,
         withData: true,
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
       );
       if (result == null) return;
       final existingKeys = pickedFiles.map(_fileKey).toSet();

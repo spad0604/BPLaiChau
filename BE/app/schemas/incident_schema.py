@@ -10,6 +10,9 @@ class SeizedItem(BaseModel):
 
 
 class IncidentIn(BaseModel):
+    # Case identification
+    case_code: str  # Mã hồ sơ (user provided)
+
     # Ownership/Unit
     station_id: Optional[str] = ""
     station_name: Optional[str] = ""
@@ -43,7 +46,8 @@ class IncidentIn(BaseModel):
 
 
 class IncidentOut(BaseModel):
-    incident_id: str
+    incident_id: str  # UUID
+    case_code: str  # Mã hồ sơ
     created_at: str
 
     station_id: Optional[str] = ""

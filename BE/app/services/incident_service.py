@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from psycopg2.extras import RealDictCursor, Json
+import uuid
 
 from app.models.incident import Incident
 from app.schemas.base_response import BaseResponse
@@ -17,39 +18,8 @@ class IncidentService:
         return try_get_connection()
     
     def _generate_incident_id(self) -> str:
-        """Generate sequential incident ID based on year (e.g., 012026, 022026)"""
-        conn = self._db()
-        if conn is None:
-            # Fallback to timestamp-based ID
-            return datetime.utcnow().strftime("%m%d%H%M%S")
-        
-        try:
-            year = datetime.utcnow().year
-            with conn.cursor() as cur:
-                # Get the highest sequence number for this year
-                cur.execute(
-                    """
-                    SELECT incident_id FROM incidents 
-                    WHERE incident_id ~ '^[0-9]{6}$' 
-                    AND RIGHT(incident_id, 4) = %s
-                    ORDER BY incident_id DESC 
-                    LIMIT 1
-                    """,
-                    (str(year),)
-                )
-                row = cur.fetchone()
-                if row:
-                    last_id = row[0]
-                    seq = int(last_id[:2]) + 1
-                else:
-                    seq = 1
-                
-                return f"{seq:02d}{year}"
-        except Exception:
-            # Fallback
-            return datetime.utcnow().strftime("%m%d%H%M%S")
-        finally:
-            conn.close()
+        """Generate UUID for incident ID"""
+        return str(uuid.uuid4())
 
     def _row_to_incident_dict(self, row: Any) -> Dict[str, Any]:
         if isinstance(row, dict):
@@ -97,17 +67,18 @@ class IncidentService:
                             cur.execute(
                                 """
                                 insert into incidents (
-                                    incident_id, created_at,
+                                    incident_id, case_code, created_at,
                                     station_id, station_name,
                                     incident_type, severity, status,
                                     occurred_at, location, title, description,
                                     handling_measure, prosecuted_behavior, seized_items,
                                     results, form_of_punishment, penalty_amount, note,
                                     evidence
-                                ) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                                ) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                                 """,
                                 (
                                     incident.incident_id,
+                                    incident.case_code,
                                     incident.created_at,
                                     incident.station_id,
                                     incident.station_name,
@@ -303,6 +274,7 @@ class IncidentService:
                             return BaseResponse(status=404, message="Incident not found", data=None)
 
                         allowed = {
+                            "case_code",
                             "station_id",
                             "station_name",
                             "incident_type",

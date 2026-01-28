@@ -1,11 +1,8 @@
 /// Centralized API endpoints and base URL for the app.
 class Endpoints {
   // Change this value once for all requests. Use emulator loopback for Android emulator.
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue:
-        'https://repository-moses-tears-browsing.trycloudflare.com/api',
-  );
+  static const String baseUrl =
+      'https://repository-moses-tears-browsing.trycloudflare.com/api';
 
   // Auth
   static const String authLogin = '/auth/login';

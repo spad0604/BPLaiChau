@@ -119,11 +119,7 @@ class CaseListView extends GetView<CaseListController> {
                           final station = (e.stationName?.isNotEmpty ?? false)
                               ? e.stationName!
                               : '-';
-                          final code = e.incidentId.isEmpty
-                              ? '-'
-                              : (e.incidentId.length >= 6
-                                    ? e.incidentId.substring(0, 6)
-                                    : e.incidentId);
+                          final code = e.caseCode.isEmpty ? '-' : e.caseCode;
 
                           return DataRow(
                             cells: [

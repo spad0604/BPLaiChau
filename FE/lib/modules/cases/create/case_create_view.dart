@@ -141,6 +141,13 @@ class CaseCreateView extends GetView<CaseCreateController> {
             child: Column(
               children: [
                 AppTextField(
+                  label: 'Mã hồ sơ',
+                  hint: 'VD: HS-001/2026',
+                  controller: controller.caseCodeCtrl,
+                  prefixIcon: Icons.badge_outlined,
+                ),
+                const SizedBox(height: 16),
+                AppTextField(
                   label: 'Tiêu đề vụ việc',
                   hint: '',
                   controller: controller.titleCtrl,

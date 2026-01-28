@@ -75,9 +75,13 @@ class DashboardSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final role = (TokenStorage.instance.role ?? '');
     final visibleItems = items.where((it) {
-      if (it.key == SidebarItemKey.banners ||
-          it.key == SidebarItemKey.legalDocs) {
+      // Banners: only super_admin
+      if (it.key == SidebarItemKey.banners) {
         return role == 'super_admin';
+      }
+      // Legal Docs: admin and super_admin can view
+      if (it.key == SidebarItemKey.legalDocs) {
+        return role == 'super_admin' || role == 'admin';
       }
       return true;
     }).toList();

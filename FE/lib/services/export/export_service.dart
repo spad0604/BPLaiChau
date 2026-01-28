@@ -4,6 +4,7 @@ import 'csv_exporter.dart';
 class ExportService {
   static Future<void> exportIncidentsCsv(List<IncidentModel> items) async {
     final headers = <String>[
+      'case_code',
       'incident_id',
       'title',
       'location',
@@ -17,18 +18,21 @@ class ExportService {
     ];
 
     final rows = items
-        .map((i) => <String>[
-              i.incidentId,
-              i.title,
-              i.location,
-              i.stationName ?? '',
-              i.incidentType ?? '',
-              i.severity ?? '',
-              i.status ?? '',
-              i.occurredAt ?? '',
-              i.createdAt ?? '',
-              i.evidence.length.toString(),
-            ])
+        .map(
+          (i) => <String>[
+            i.caseCode,
+            i.incidentId,
+            i.title,
+            i.location,
+            i.stationName ?? '',
+            i.incidentType ?? '',
+            i.severity ?? '',
+            i.status ?? '',
+            i.occurredAt ?? '',
+            i.createdAt ?? '',
+            i.evidence.length.toString(),
+          ],
+        )
         .toList();
 
     await CsvExporter.export(
@@ -52,15 +56,17 @@ class ExportService {
     String s(dynamic v) => (v ?? '').toString();
 
     final rows = items
-        .map((u) => <String>[
-              s(u['username']),
-              s(u['full_name']),
-              s(u['role']),
-              s(u['phone_number']),
-              s(u['date_of_birth']),
-              s(u['indentity_card_number']),
-              s(u['gender']),
-            ])
+        .map(
+          (u) => <String>[
+            s(u['username']),
+            s(u['full_name']),
+            s(u['role']),
+            s(u['phone_number']),
+            s(u['date_of_birth']),
+            s(u['indentity_card_number']),
+            s(u['gender']),
+          ],
+        )
         .toList();
 
     await CsvExporter.export(

@@ -3,7 +3,8 @@ from typing import List, Dict, Any
 
 @dataclass
 class Incident:
-    incident_id: str = ""
+    incident_id: str = ""  # UUID
+    case_code: str = ""  # Mã hồ sơ (user input)
     created_at: str = ""
 
     # Ownership/Unit

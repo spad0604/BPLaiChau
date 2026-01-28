@@ -22,6 +22,7 @@ class CaseCreateController extends BaseController {
     return '${f.name}|${f.size}|$p';
   }
 
+  final caseCodeCtrl = TextEditingController();
   final titleCtrl = TextEditingController();
   final locationCtrl = TextEditingController();
   final descriptionCtrl = QuillController.basic();
@@ -150,10 +151,11 @@ class CaseCreateController extends BaseController {
     final descHtml = _quillToHtml(descriptionCtrl);
     final descPlainText = descriptionCtrl.document.toPlainText().trim();
 
-    if (titleCtrl.text.trim().isEmpty ||
+    if (caseCodeCtrl.text.trim().isEmpty ||
+        titleCtrl.text.trim().isEmpty ||
         locationCtrl.text.trim().isEmpty ||
         descPlainText.isEmpty) {
-      showError('Vui lòng nhập đủ: tiêu đề, địa bàn, nội dung');
+      showError('Vui lòng nhập đủ: mã hồ sơ, tiêu đề, địa bàn, nội dung');
       return;
     }
 
@@ -163,6 +165,7 @@ class CaseCreateController extends BaseController {
         (s) => s.stationId == stationId.value,
       );
       final payload = <String, dynamic>{
+        'case_code': caseCodeCtrl.text.trim(),
         'incident_type': incidentType.value,
         'severity': severity.value,
         'occurred_at': date.value?.toIso8601String() ?? '',
@@ -230,6 +233,7 @@ class CaseCreateController extends BaseController {
   }
 
   void _clearForm() {
+    caseCodeCtrl.clear();
     titleCtrl.clear();
     locationCtrl.clear();
     descriptionCtrl.clear();
@@ -261,6 +265,7 @@ class CaseCreateController extends BaseController {
   void onClose() {
     _dateWorker?.dispose();
     dateTextCtrl.dispose();
+    caseCodeCtrl.dispose();
     titleCtrl.dispose();
     locationCtrl.dispose();
     descriptionCtrl.dispose();
